@@ -1,8 +1,8 @@
 #!/bin/bash
 
-source $(dirname ${BASH_SOURCE[0]})/echo.sh
-source $(dirname ${BASH_SOURCE[0]})/log.env
-source $(dirname ${BASH_SOURCE[0]})/sourceenv.sh
+source $(dirname ${BASH_SOURCE[0]:-$0})/echo.sh
+source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function handle_log_file() {
   if [[ -z $BASH_UTILS_LOG_PATH ]]; then

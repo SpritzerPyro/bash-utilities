@@ -1,7 +1,7 @@
 #!/bin/bash
 
-source $(dirname ${BASH_SOURCE[0]})/colors.env
-source $(dirname ${BASH_SOURCE[0]})/sourceenv.sh
+source $(dirname ${BASH_SOURCE[0]:-$0})/colors.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function echo_emph() {
   echo -e "${BASH_UTILS_EMPH_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}"
