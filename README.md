@@ -56,11 +56,13 @@ log_warn "Lorem ipsum dolor sit amet"
 [2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
 ```
 
+## Config
+
+The behaviour of the bash utilities can be configured by setting environment variables.
+
+The utilities try to read a custom env file called `.bashutils.env` in the project root. If the file does not exists, the utilities also try to source the file from the parent directory, in case the repository is used as a git submodule. If no custom `.bashutils.env` exists, the utitlies will use the default config.
+
 ## Environment
-
-The behaviour of the bash utilities can be configured by environment variables.
-
-For a persistant configuration values can be written to `.bashutils.env` in the project root directory.
 
 ### Colors
 
