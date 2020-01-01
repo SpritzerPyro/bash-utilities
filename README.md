@@ -2,7 +2,41 @@
 
 A collection of some bash script utilities.
 
-## Echo utilities
+## Utilities
+
+### checks.sh
+
+The file `lib/checks.sh` includes utilties to use as expression in statements.
+
+#### is_true
+
+Returns `0` (truthy) if the passed argument equals `true` or `1`.
+
+```bash
+is_true 1       # 0 (truthy)
+is_true true    # 0 (truthy)
+is_true "1"     # 0 (truthy)
+is_true "true"  # 0 (truthy)
+
+is_true ""      # 1 (falsy)
+is_true foo     # 1 (falsy)
+```
+
+#### is_false
+
+Returns `0` (truthy) if the passed argument equals `false` or `0`.
+
+```bash
+is_false 0       # 0 (truthy)
+is_false false   # 0 (truthy)
+is_false "0"     # 0 (truthy)
+is_false "false" # 0 (truthy)
+
+is_false ""      # 1 (falsy)
+is_false foo     # 1 (falsy)
+```
+
+### echo.sh
 
 The script `lib/echo.sh` includes some functions to use the `echo` command using different colors.
 
@@ -25,7 +59,7 @@ echo_success "Lorem ipsum dolor sit amet"
 echo_warn "Lorem ipsum dolor sit amet"
 ```
 
-## Log utilities
+### log.sh
 
 **File logs are disabled by default. Set `BASH_UTILS_LOG_PATH` to enable them.**
 
