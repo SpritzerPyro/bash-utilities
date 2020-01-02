@@ -90,6 +90,16 @@ log_warn "Lorem ipsum dolor sit amet"
 [2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
 ```
 
+### log_exit_error.sh
+
+Including the `lib/log_exit_error.sh` script enables fundamental error handling including logging. All errors are appended to the log file specified via `BASH_UTILS_LOG_PATH`. The script also sets `errexit` and `pipefail`.
+
+If an error occurs, the error is appended to the log file and the script exits immediatlely. Also the exit code and the name of the script is logged in the log file.
+
+Because the `stderr` output is read and again written to the `stdout` and the logfile, the order of the output may get lost.
+
+Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
+
 ## Config
 
 The behaviour of the bash utilities can be configured by setting environment variables.
