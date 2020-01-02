@@ -1,0 +1,46 @@
+#!/bin/bash
+
+if [[ -z $1 ]]; then
+  echo "Usage: $(basename $0) path/to/file"
+  exit 1
+fi
+
+if [[ -d $1 ]]; then
+  echo "Specified path is a directory" >&2
+  exit 1
+fi
+
+if [[ -f $1 ]]; then
+  while true; do
+    echo -n "Specified file already exists. Overwrite it (y|n)? "
+    read yn_answer
+
+    case $yn_answer in
+      [Yy]) break ;;
+      [Nn]) exit ;;
+      *) echo "Please answer y for yes or n for no." ;;
+    esac
+  done
+fi
+
+readonly current_dir=$(dirname $(readlink -f $0))
+readonly working_dir=$(readlink -f $current_dir/..)
+readonly libpath=$(realpath --relative-to=$(dirname $1) $working_dir/lib)
+readonly target=$(readlink -f $1)
+
+source $current_dir/../lib/echo.sh
+
+echo -n "Create script $target ... "
+
+echo "#!/bin/bash" > $target
+echo "" >> $target
+echo "set -eo pipefail" >> $target
+echo "" >> $target
+echo "current_dir=\$(dirname \$(readlink -f \$0))" >> $target
+echo "bash_utils_lib_dir=\$(readlink -f \$current_dir/$libpath)" >> $target
+echo "" >> $target
+echo "source \$bash_utils_lib_dir/log_exit_error.sh" >> $target
+
+chmod +x $target
+
+echo_success "done"
