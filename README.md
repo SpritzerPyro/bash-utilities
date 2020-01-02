@@ -6,7 +6,7 @@ A collection of some bash script utilities.
 
 ### checks.sh
 
-The file `lib/checks.sh` includes utilties to use as expression in statements.
+The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
 #### is_true
 
@@ -63,7 +63,7 @@ echo_warn "Lorem ipsum dolor sit amet"
 
 **File logs are disabled by default. Set `BASH_UTILS_LOG_PATH` to enable them.**
 
-The logging utilities located in `lib/log.sh` extend the echo utilties appending the output to a log file. They also use the same color settings.
+The logging utilities located in `lib/log.sh` extend the echo utilities appending the output to a log file. They also use the same color settings.
 
 To enable file logging, the `BASH_UTILS_LOG_PATH` environment variable has to be set (see [Environment](#environment)). An unset variable disables logging. Regardless of whether logging is set or not, the output will be written to stdout.
 
@@ -90,11 +90,21 @@ log_warn "Lorem ipsum dolor sit amet"
 [2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
 ```
 
+### log_exit_error.sh
+
+Including the `lib/log_exit_error.sh` script enables fundamental error handling including logging. All errors are appended to the log file specified via `BASH_UTILS_LOG_PATH`. The script also sets `errexit` and `pipefail`.
+
+If an error occurs, the error is appended to the log file and the script exits immediately. Also, the exit code and the name of the script is logged in the log file.
+
+Because the `stderr` output is read and again written to the `stdout` and the log file, the order of the output may get lost.
+
+Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
+
 ## Config
 
-The behaviour of the bash utilities can be configured by setting environment variables.
+The behavior of the bash utilities can be configured by setting environment variables.
 
-The utilities try to read a custom env file called `.bashutils.env` in the project root. If the file does not exists, the utilities also try to source the file from the parent directory, in case the repository is used as a git submodule. If no custom `.bashutils.env` exists, the utitlies will use the default config.
+The utilities try to read a custom env file called `.bashutils.env` in the project root. If the file does not exist, the utilities also try to source the file from the parent directory, in case the repository is used as a git submodule. If no custom `.bashutils.env` exists, the utilities will use the default config.
 
 ## Environment
 
@@ -114,5 +124,5 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 
 | Variables                 | Default  | Description                                                            |
 | ------------------------- | -------- | ---------------------------------------------------------------------- |
-| `BASH_UTILS_LOG_PATH`     |          | File written to by logging utiltites. An empty value disables logging. |
+| `BASH_UTILS_LOG_PATH`     |          | File written to by logging utilities. An empty value disables logging. |
 | `BASH_UTILS_MAX_LOG_SIZE` | 20971520 | The maximum log file size                                              |
