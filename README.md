@@ -2,6 +2,14 @@
 
 A collection of some bash script utilities.
 
+## Create new script
+
+To create a new script with some default configuration call `bin/createscript` followed by the path to the new file.
+
+```bash
+./bin/createscript path/to/file
+```
+
 ## Utilities
 
 ### checks.sh
