@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source $(dirname ${BASH_SOURCE[0]:-$0})/colors.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function echo_emph() {
@@ -16,8 +17,9 @@ function echo_info() {
 }
 
 function echo_prefix() {
-  local prefix="[$(date "+%F %T")]"
-  echo -e "${BASH_UTILS_PREFIX_COLOR}$prefix $@${BASH_UTILS_DEFAULT_COLOR}"
+  local prefix=""
+  [[ ! -z $BASH_UTILS_LOG_PREFIX ]] && local prefix="$BASH_UTILS_LOG_PREFIX "
+  echo -e "${BASH_UTILS_PREFIX_COLOR}${prefix}$@${BASH_UTILS_DEFAULT_COLOR}"
 }
 
 function echo_success() {
