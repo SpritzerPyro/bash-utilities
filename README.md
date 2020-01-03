@@ -137,6 +137,8 @@ If an error occurs, the error is appended to the log file and the script exits i
 
 Because the `stderr` output is read and again written to the `stdout` and the log file, the order of the output may get lost.
 
+Logging `stderr` output to the log file can be diabled by setting `BASH_UTILS_LOG_STDERR` to `false` or `0`.
+
 Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
 
 ## Config
@@ -165,4 +167,5 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 | ------------------------- | ------------------ | ---------------------------------------------------------------------- |
 | `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. An empty value disables logging. |
 | `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                      |
+| `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                     |
 | `BASH_UTILS_MAX_LOG_SIZE` | 20971520           | The maximum log file size                                              |
