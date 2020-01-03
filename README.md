@@ -16,6 +16,37 @@ To create a new script with some default configuration call `bin/createscript` f
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
+### docker.sh
+
+The file `lib/docker.sh` contains utilities for docker and docker-compose.
+
+#### docker_compose_export_pid
+
+Writes the process id of a specified docker-compose service to the specified file. Optionally the path to the docker-compose.yml can be specified as third argument.
+
+```bash
+docker_compose_export_pid app /path/to/pidfile
+docker_compose_export_pid app /path/to/pidfile /path/to/docker-compose.yml
+```
+
+#### docker_compose_service_id
+
+Returns the container id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as second argument.
+
+```bash
+docker_compose_service_id app
+docker_compose_service_id app /path/to/docker-compose.yml
+```
+
+#### docker_compose_service_pid
+
+Returns the process id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as second argument.
+
+```bash
+docker_compose_service_pid app
+docker_compose_service_pid app /path/to/docker-compose.yml
+```
+
 #### is_true
 
 Returns `0` (truthy) if the passed argument equals `true` or `1`.
