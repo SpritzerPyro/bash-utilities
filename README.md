@@ -107,6 +107,14 @@ The function accepts a list of files and calls [export_dotenv](#exportdotenv) fo
 export_dotenvs *.env .env myfile
 ```
 
+#### export_to_env
+
+Reads all lines in the form `export KEY=VALUE` from the specified file and transform them to `KEY=VALUE`. Can be used to write them to a dotenv file.
+
+```bash
+export_to_env myscript > new.env
+```
+
 #### source_dotenv
 
 Sources the specified dotenv file. The function writes to stderr and returns `1` if the file does not exist or is an invalid dotenv file.
