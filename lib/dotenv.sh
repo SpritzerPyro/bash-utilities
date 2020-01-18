@@ -1,5 +1,11 @@
 #!/bin/bash
 
+function dotenv_is_valid() {
+  local data=$(grep -Ev "^(\S+=|#|$)" $1 || true)
+
+  [[ -z $data ]]
+}
+
 function export_dotenv() {
   [[ ! -f $1 ]] && return 1
 
