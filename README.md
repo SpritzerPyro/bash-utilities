@@ -16,6 +16,34 @@ To create a new script with some default configuration call `bin/createscript` f
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
+#### is_true
+
+Returns `0` (truthy) if the passed argument equals `true` or `1`.
+
+```bash
+is_true 1       # 0 (truthy)
+is_true true    # 0 (truthy)
+is_true "1"     # 0 (truthy)
+is_true "true"  # 0 (truthy)
+
+is_true ""      # 1 (falsy)
+is_true foo     # 1 (falsy)
+```
+
+#### is_false
+
+Returns `0` (truthy) if the passed argument equals `false` or `0`.
+
+```bash
+is_false 0       # 0 (truthy)
+is_false false   # 0 (truthy)
+is_false "0"     # 0 (truthy)
+is_false "false" # 0 (truthy)
+
+is_false ""      # 1 (falsy)
+is_false foo     # 1 (falsy)
+```
+
 ### docker.sh
 
 The file `lib/docker.sh` contains utilities for docker and docker-compose.
@@ -47,32 +75,52 @@ docker_compose_service_pid app
 docker_compose_service_pid app /path/to/docker-compose.yml
 ```
 
-#### is_true
+### dotenv.sh
 
-Returns `0` (truthy) if the passed argument equals `true` or `1`.
+In the script `lib/dotenv.sh` utilities to deal with dotenv files can be found.
+
+#### dotenv_is_valid
+
+The function reads the specified file and returns `0` (`true`) if it is a valid dotenv file. Else the function returns `1` (`false`).
+
+A valid dotenv file only includes lines in the format `KEY=VALUE` or comments (`# My comment`).
 
 ```bash
-is_true 1       # 0 (truthy)
-is_true true    # 0 (truthy)
-is_true "1"     # 0 (truthy)
-is_true "true"  # 0 (truthy)
-
-is_true ""      # 1 (falsy)
-is_true foo     # 1 (falsy)
+dotenv_is_valid my.env # 0 or 1
 ```
 
-#### is_false
+#### export_dotenv
 
-Returns `0` (truthy) if the passed argument equals `false` or `0`.
+The specified file is sourced and the variables are exported to the current environment.
+
+If the file does not exist, or it is an invalid dotenv file, the function writes to `stdout` and returns `1`.
 
 ```bash
-is_false 0       # 0 (truthy)
-is_false false   # 0 (truthy)
-is_false "0"     # 0 (truthy)
-is_false "false" # 0 (truthy)
+export_dotenv my.env
+```
 
-is_false ""      # 1 (falsy)
-is_false foo     # 1 (falsy)
+#### export_dotenvs
+
+The function accepts a list of files and calls [export_dotenv](#exportdotenv) for each file. Globbing patterns are allowed as well.
+
+```bash
+export_dotenvs *.env .env myfile
+```
+
+#### source_dotenv
+
+Sources the specified dotenv file. The function writes to stderr and returns `1` if the file does not exist or is an invalid dotenv file.
+
+```bash
+source_dotenv my.env
+```
+
+#### source_dotenvs
+
+The function accepts a list of files and calls [source_dotenv](#sourcedotenv) for each file. Globbing patterns are allowed as well.
+
+```bash
+source_dotenvs *.env .env myfile
 ```
 
 ### echo.sh
