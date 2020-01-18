@@ -16,6 +16,34 @@ To create a new script with some default configuration call `bin/createscript` f
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
+#### is_true
+
+Returns `0` (truthy) if the passed argument equals `true` or `1`.
+
+```bash
+is_true 1       # 0 (truthy)
+is_true true    # 0 (truthy)
+is_true "1"     # 0 (truthy)
+is_true "true"  # 0 (truthy)
+
+is_true ""      # 1 (falsy)
+is_true foo     # 1 (falsy)
+```
+
+#### is_false
+
+Returns `0` (truthy) if the passed argument equals `false` or `0`.
+
+```bash
+is_false 0       # 0 (truthy)
+is_false false   # 0 (truthy)
+is_false "0"     # 0 (truthy)
+is_false "false" # 0 (truthy)
+
+is_false ""      # 1 (falsy)
+is_false foo     # 1 (falsy)
+```
+
 ### docker.sh
 
 The file `lib/docker.sh` contains utilities for docker and docker-compose.
@@ -45,34 +73,6 @@ Returns the process id of a specified docker-compose service. Optionally the pat
 ```bash
 docker_compose_service_pid app
 docker_compose_service_pid app /path/to/docker-compose.yml
-```
-
-#### is_true
-
-Returns `0` (truthy) if the passed argument equals `true` or `1`.
-
-```bash
-is_true 1       # 0 (truthy)
-is_true true    # 0 (truthy)
-is_true "1"     # 0 (truthy)
-is_true "true"  # 0 (truthy)
-
-is_true ""      # 1 (falsy)
-is_true foo     # 1 (falsy)
-```
-
-#### is_false
-
-Returns `0` (truthy) if the passed argument equals `false` or `0`.
-
-```bash
-is_false 0       # 0 (truthy)
-is_false false   # 0 (truthy)
-is_false "0"     # 0 (truthy)
-is_false "false" # 0 (truthy)
-
-is_false ""      # 1 (falsy)
-is_false foo     # 1 (falsy)
 ```
 
 ### echo.sh
