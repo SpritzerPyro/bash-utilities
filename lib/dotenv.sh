@@ -18,3 +18,10 @@ function export_dotenvs() {
 function export_to_env() {
   grep -E "^export\s\S+=" $1 | sed 's/export\s//'
 }
+
+function source_dotenvs() {
+  for i in $@; do
+    [[ ! -f $i ]] && continue
+    source $i
+  done
+}
