@@ -59,7 +59,7 @@ docker_compose_export_pid app /path/to/pidfile /path/to/docker-compose.yml
 
 #### docker_compose_service_id
 
-Returns the container id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as second argument.
+Returns the container id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as a second argument.
 
 ```bash
 docker_compose_service_id app
@@ -68,7 +68,7 @@ docker_compose_service_id app /path/to/docker-compose.yml
 
 #### docker_compose_service_pid
 
-Returns the process id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as second argument.
+Returns the process id of a specified docker-compose service. Optionally the path to the docker-compose.yml can be specified as a second argument.
 
 ```bash
 docker_compose_service_pid app
@@ -105,6 +105,14 @@ The function accepts a list of files and calls [export_dotenv](#exportdotenv) fo
 
 ```bash
 export_dotenvs *.env .env myfile
+```
+
+#### export_to_env
+
+Reads all lines in the form `export KEY=VALUE` from the specified file and transform them into `KEY=VALUE`. The function be used to write them to a dotenv file.
+
+```bash
+export_to_env myscript > new.env
 ```
 
 #### source_dotenv
@@ -185,7 +193,7 @@ If an error occurs, the error is appended to the log file and the script exits i
 
 Because the `stderr` output is read and again written to the `stdout` and the log file, the order of the output may get lost.
 
-Logging `stderr` output to the log file can be diabled by setting `BASH_UTILS_LOG_STDERR` to `false` or `0`.
+Logging `stderr` output to the log file can be disabled by setting `BASH_UTILS_LOG_STDERR` to `false` or `0`.
 
 Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
 
