@@ -9,7 +9,7 @@ function export_dotenv() {
 }
 
 function export_dotenvs() {
-  for i in $1/*.env; do
+  for i in $@; do
     [[ ! -f $i ]] && continue
     export_dotenv $i
   done
