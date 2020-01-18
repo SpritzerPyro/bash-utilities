@@ -7,7 +7,15 @@ function dotenv_is_valid() {
 }
 
 function export_dotenv() {
-  [[ ! -f $1 ]] && return 1
+  if [[ ! -f $1 ]]; then
+    echo "export_dotenv: File '$1' does not exist" >&2
+    return 1
+  fi
+
+  if ! dotenv_is_valid $1; then
+    echo "export_dotenv: File '$1' is not a valid dotenv file" >&2
+    return 1
+  fi
 
   set -a
   source $1
