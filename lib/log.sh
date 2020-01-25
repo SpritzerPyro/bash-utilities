@@ -59,14 +59,14 @@ function writelog() {
 }
 
 function log() {
-  local echoonly=false
+  local chalk=false
   local level=info
   local OPTIND
   local silent=false
 
-  while getopts 'el:s' flag; do
+  while getopts 'cl:s' flag; do
     case $flag in
-      e) echoonly=true ;;
+      c) chalk=true ;;
       l) level=$OPTARG ;;
       s) silent=true ;;
     esac
@@ -76,12 +76,12 @@ function log() {
 
   if [[ $# -gt 0 ]]; then
     [[ $silent != "true" ]] && echo $@ | chalk -l $level
-    [[ $echoonly != "true" ]] && echo $@ | writelog -l $level
+    [[ $chalk != "true" ]] && echo $@ | writelog -l $level
     return
   fi
 
   while read data; do
     [[ $silent != "true" ]] && echo $data | chalk -l $level
-    [[ $echoonly != "true" ]] && echo $data | writelog -l $level
+    [[ $chalk != "true" ]] && echo $data | writelog -l $level
   done
 }
