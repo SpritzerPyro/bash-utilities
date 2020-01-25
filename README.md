@@ -2,9 +2,9 @@
 
 A collection of some bash script utilities.
 
-## Create new script
+## Create a new script
 
-To create a new script with some default configuration call `bin/createscript` followed by the path to the new file.
+To create a new script with some default configuration, call `bin/createscript` followed by the path to the new file.
 
 ```bash
 ./bin/createscript path/to/file
@@ -50,7 +50,7 @@ The file `lib/docker.sh` contains utilities for docker and docker-compose.
 
 #### docker_compose_export_pid
 
-Writes the process id of a specified docker-compose service to the specified file. Optionally the path to the docker-compose.yml can be specified as third argument.
+Writes the process id of a specified docker-compose service to the specified file. Optionally the path to the docker-compose.yml can be specified as the third argument.
 
 ```bash
 docker_compose_export_pid app /path/to/pidfile
@@ -109,7 +109,7 @@ export_dotenvs *.env .env myfile
 
 #### export_to_env
 
-Reads all lines in the form `export KEY=VALUE` from the specified file and transform them into `KEY=VALUE`. The function be used to write them to a dotenv file.
+Reads all lines in the form `export KEY=VALUE` from the specified file and transform them into `KEY=VALUE`. The function can be used to write them to a dotenv file.
 
 ```bash
 export_to_env myscript > new.env
@@ -165,7 +165,12 @@ echo "Oh snap!" | chalk -l error
 
 The logging utilities located in `lib/log.sh` extend the echo utilities appending the output to a log file. They also use the same color or level settings.
 
-To enable file logging, the `BASH_UTILS_LOG_PATH` environment variable has to be set (see [Environment](#environment)). An unset variable disables logging. Regardless of whether logging is set or not, the output will be written to stdout.
+To enable file logging, the `BASH_UTILS_LOG_PATH` environment variable has to be set (see [Environment](#environment)). An unset variable disables logging, else the output is logged into the specified file or to a space-separated list of files. Regardless of whether logging is set or not, the output will be written to stdout.
+
+```bash
+BASH_UTILS_LOG_PATH=/var/log/foo.log
+BASH_UTILS_LOG_PATH=/var/log/foo.log\ /var/log/bar.log
+```
 
 The log file rotates after reaching a size defined by `BASH_UTILS_MAX_LOG_SIZE`.
 
@@ -181,7 +186,7 @@ The `log` command "chalks" and writes to `BASH_UTILS_LOG_PATH`.
 | ---- | ------- | ------------------------------------------ |
 | -c   | chalk   | Only chalks but does not write to log file |
 | -l   | level   | Log level [(see chalk)](#chalksh)          |
-| -s   | silent  | Writes to log file but does not chalk      |
+| -s   | silent  | Writes to the log file but does not chalk  |
 
 Output can also be piped into the `log` command.
 
@@ -244,9 +249,9 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 
 ## Log
 
-| Variables                 | Default            | Description                                                            |
-| ------------------------- | ------------------ | ---------------------------------------------------------------------- |
-| `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. An empty value disables logging. |
-| `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                      |
-| `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                     |
-| `BASH_UTILS_MAX_LOG_SIZE` | 20971520           | The maximum log file size                                              |
+| Variables                 | Default            | Description                                                                                                                              |
+| ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. To log to multiple files a space-separated list can be specified. An empty value disables logging. |
+| `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                                                                                        |
+| `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                                                                                       |
+| `BASH_UTILS_MAX_LOG_SIZE` | 20971520           | The maximum log file size                                                                                                                |
