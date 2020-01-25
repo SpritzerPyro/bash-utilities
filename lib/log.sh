@@ -49,12 +49,12 @@ function writelog() {
   fi
   
   if [[ $# -gt 0 ]]; then
-    echo -e "$prefix$(echo $@ | chalk -l $level)" >> $BASH_UTILS_LOG_PATH
+    echo -e "$prefix$(echo $@ | chalk -l $level)" | tee -a $BASH_UTILS_LOG_PATH >/dev/null
     return
   fi
   
   while read data; do
-    echo -e "$prefix$(echo $data | chalk -l $level)" >> $BASH_UTILS_LOG_PATH
+    echo -e "$prefix$(echo $data | chalk -l $level)" | tee -a $BASH_UTILS_LOG_PATH >/dev/null
   done
 }
 
