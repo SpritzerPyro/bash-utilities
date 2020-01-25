@@ -28,7 +28,7 @@ readonly working_dir=$(readlink -f $current_dir/..)
 readonly libpath=$(realpath --relative-to=$(dirname $1) $working_dir/lib)
 readonly target=$(readlink -f $1)
 
-source $current_dir/../lib/echo.sh
+source $current_dir/../lib/chalk.sh
 
 echo -n "Create script $target ... "
 
@@ -43,4 +43,4 @@ echo "source \$bash_utils_lib_dir/log_exit_error.sh" >> $target
 
 chmod +x $target
 
-echo_success "done"
+chalk -l success "done"
