@@ -131,27 +131,32 @@ The function accepts a list of files and calls [source_dotenv](#sourcedotenv) fo
 source_dotenvs *.env .env myfile
 ```
 
-### echo.sh
+### chalk.sh
 
-The script `lib/echo.sh` includes some functions to use the `echo` command using different colors.
+The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
+
+The color is defined by the specified level.
+
+| level   | description       | default color |
+| ------- | ----------------- | ------------- |
+| emph    | Emphasized        | blue          |
+| error   | Indicates errors  | red           |
+| info    | Normal text       | default       |
+| success | Indicates success | green         |
+| warn    | Warning text      | yellow        |
 
 For color configuration options see [color environment variables](#colors).
 
+#### chalk
+
+The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
+
+Output can also be piped into the `chalk` command.
+
 ```bash
-# Emphasized (default: blue)
-echo_emph "Lorem ipsum dolor sit amet"
-
-# Error (default: red)
-echo_error "Lorem ipsum dolor sit amet"
-
-# Info (default: default color)
-echo_info "Lorem ipsum dolor sit amet"
-
-# Success (default: green)
-echo_success "Lorem ipsum dolor sit amet"
-
-# Warning (default: orange)
-echo_warn "Lorem ipsum dolor sit amet"
+chalk "Lorem ipsum dolor sit amet"
+chalk -l emph "Lorem ipsum dolor sit amet"
+echo "Oh snap!" | chalk -l error
 ```
 
 ### log.sh
