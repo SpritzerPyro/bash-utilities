@@ -131,34 +131,39 @@ The function accepts a list of files and calls [source_dotenv](#sourcedotenv) fo
 source_dotenvs *.env .env myfile
 ```
 
-### echo.sh
+### chalk.sh
 
-The script `lib/echo.sh` includes some functions to use the `echo` command using different colors.
+The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
+
+The color is defined by the specified level.
+
+| Level   | Description       | Default color |
+| ------- | ----------------- | ------------- |
+| emph    | Emphasized        | blue          |
+| error   | Indicates errors  | red           |
+| info    | Normal text       | default       |
+| success | Indicates success | green         |
+| warn    | Warning text      | yellow        |
 
 For color configuration options see [color environment variables](#colors).
 
+#### chalk
+
+The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
+
+Output can also be piped into the `chalk` command.
+
 ```bash
-# Emphasized (default: blue)
-echo_emph "Lorem ipsum dolor sit amet"
-
-# Error (default: red)
-echo_error "Lorem ipsum dolor sit amet"
-
-# Info (default: default color)
-echo_info "Lorem ipsum dolor sit amet"
-
-# Success (default: green)
-echo_success "Lorem ipsum dolor sit amet"
-
-# Warning (default: orange)
-echo_warn "Lorem ipsum dolor sit amet"
+chalk "Lorem ipsum dolor sit amet"
+chalk -l emph "Lorem ipsum dolor sit amet"
+echo "Oh snap!" | chalk -l error
 ```
 
 ### log.sh
 
 **File logs are disabled by default. Set `BASH_UTILS_LOG_PATH` to enable them.**
 
-The logging utilities located in `lib/log.sh` extend the echo utilities appending the output to a log file. They also use the same color settings.
+The logging utilities located in `lib/log.sh` extend the echo utilities appending the output to a log file. They also use the same color or level settings.
 
 To enable file logging, the `BASH_UTILS_LOG_PATH` environment variable has to be set (see [Environment](#environment)). An unset variable disables logging. Regardless of whether logging is set or not, the output will be written to stdout.
 
@@ -166,22 +171,42 @@ The log file rotates after reaching a size defined by `BASH_UTILS_MAX_LOG_SIZE`.
 
 File logs additionally are prefixed with a custom string and the type of log. The prefix can be set via the `BASH_UTILS_LOG_PREFIX` variable and defaults to the current timestamp.
 
+### log
+
+The `log` command "chalks" and writes to `BASH_UTILS_LOG_PATH`.
+
+**Usage:** `log [OPTIONS] TEXT`
+
+| flag | meaning | description                                |
+| ---- | ------- | ------------------------------------------ |
+| -c   | chalk   | Only chalks but does not write to log file |
+| -l   | level   | Log level [(see chalk)](#chalksh)          |
+| -s   | silent  | Writes to log file but does not chalk      |
+
+Output can also be piped into the `log` command.
+
 ```bash
 export BASH_UTILS_LOG_PATH=/path/to/file.log
 
-log_emph "Lorem ipsum dolor sit amet"
-[2020-01-01 13:00:38] emph    : Lorem ipsum dolor sit amet
-
-log_error "Lorem ipsum dolor sit amet"
-[2020-01-01 13:00:44] error   : Lorem ipsum dolor sit amet
-
-log_info "Lorem ipsum dolor sit amet"
+log "Lorem ipsum dolor sit amet"
 [2020-01-01 13:00:46] info    : Lorem ipsum dolor sit amet
 
-log_success "Lorem ipsum dolor sit amet"
+log -l emph "Lorem ipsum dolor sit amet"
+[2020-01-01 13:00:38] emph    : Lorem ipsum dolor sit amet
+
+log -l error "Lorem ipsum dolor sit amet"
+[2020-01-01 13:00:44] error   : Lorem ipsum dolor sit amet
+
+log -l info "Lorem ipsum dolor sit amet"
+[2020-01-01 13:00:46] info    : Lorem ipsum dolor sit amet
+
+log -l success "Lorem ipsum dolor sit amet"
 [2020-01-01 13:00:57] success : Lorem ipsum dolor sit amet
 
-log_warn "Lorem ipsum dolor sit amet"
+log -l warn "Lorem ipsum dolor sit amet"
+[2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
+
+echo "Lorem ipsum dolor sit amet" | log -l warn
 [2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
 ```
 
