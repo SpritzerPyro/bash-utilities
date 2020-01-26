@@ -29,7 +29,7 @@ function writelog() {
 
   [[ ! -z $BASH_UTILS_LOG_PREFIX ]] && prefix="$BASH_UTILS_LOG_PREFIX "
   prefix="$prefix$(printf '%-8s' $level): "
-  pretix="${BASH_UTILS_PREFIX_COLOR}${prefix}${BASH_UTILS_DEFAULT_COLOR}"
+  prefix="${BASH_UTILS_PREFIX_COLOR}${prefix}${BASH_UTILS_DEFAULT_COLOR}"
 
   if [[ -f $BASH_UTILS_LOG_PATH ]]; then
     local size=$(stat -c %s $BASH_UTILS_LOG_PATH)
