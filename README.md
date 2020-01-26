@@ -176,7 +176,7 @@ The log file rotates after reaching a size defined by `BASH_UTILS_MAX_LOG_SIZE`.
 
 File logs additionally are prefixed with a custom string and the type of log. The prefix can be set via the `BASH_UTILS_LOG_PREFIX` variable and defaults to the current timestamp.
 
-### log
+#### log
 
 The `log` command "chalks" and writes to `BASH_UTILS_LOG_PATH`.
 
@@ -213,6 +213,28 @@ log -l warn "Lorem ipsum dolor sit amet"
 
 echo "Lorem ipsum dolor sit amet" | log -l warn
 [2020-01-01 13:01:06] warning : Lorem ipsum dolor sit amet
+```
+
+#### log_native
+
+Some commands like `docker-compose up -d` create output not working properly using the standard log command.
+
+If you run into such a problem, the `log_native` command uses `tee` to natively add the output to the log file. This output then is not prefixed in the log file. To log some prefixed information, a `Run command` and `Finished command` information also is logged before and after the command is executed. This information also is customizable by passing a string as an argument to `log_native`.
+
+```bash
+docker-compose up -d | log_native "Up test docker"
+# Log file:
+# [2020-01-26 09:53:36] info    : Run 'Up test docker'
+# Creating network "bash-utilities_default" with the default driver
+# Creating bash-utilities_test_1 ... done
+# [2020-01-26 09:53:36] info    : Finished 'Up test docker'
+
+docker-compose down | log_native
+# Log file:
+# [2020-01-26 09:53:36] info    : Run command
+# Removing bash-utilities_test_1 ... done
+# Removing network bash-utilities_default
+# [2020-01-26 09:53:36] info    : Finished command
 ```
 
 ### log_exit_error.sh
