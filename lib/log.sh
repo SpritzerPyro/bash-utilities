@@ -83,3 +83,12 @@ function log() {
     [[ $chalk != "true" ]] && echo $data | writelog -l $level
   done
 }
+
+function log_native() {
+  [[ ! -z $@ ]] && local info="'$@'"
+  local info=${info:-command}
+
+  writelog "Run $info"
+  tee -a $BASH_UTILS_LOG_PATH
+  writelog "Finished $info"
+}
