@@ -221,15 +221,17 @@ Some commands like `docker-compose up -d` create output not working properly usi
 
 If you run into such a problem, the `log_native` command uses `tee` to natively add the output to the log file. This output then is not prefixed in the log file. To log some prefixed information, a `Run command` and `Finished command` information also is logged before and after the command is executed. This information also is customizable by passing a string as an argument to `log_native`.
 
+_Notice the use of `|&` because docker-compose writes to `stderr`._
+
 ```bash
-docker-compose up -d | log_native "Up test docker"
+docker-compose up -d |& log_native "Up test docker"
 # Log file:
 # [2020-01-26 09:53:36] info    : Run 'Up test docker'
 # Creating network "bash-utilities_default" with the default driver
 # Creating bash-utilities_test_1 ... done
 # [2020-01-26 09:53:36] info    : Finished 'Up test docker'
 
-docker-compose down | log_native
+docker-compose down |& log_native
 # Log file:
 # [2020-01-26 09:53:36] info    : Run command
 # Removing bash-utilities_test_1 ... done
