@@ -5,14 +5,12 @@ source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function writelog() {
-  local files
   local level=info
   local OPTIND
   local prefix=""
   
-  while getopts 'f:l:s' flag; do
+  while getopts 'l:s' flag; do
     case $flag in
-      f) filed=$OPTARG ;;
       l)
         case $OPTARG in
           emph) level=emph ;;
