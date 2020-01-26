@@ -5,14 +5,12 @@ source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function writelog() {
-  local files
   local level=info
   local OPTIND
   local prefix=""
   
-  while getopts 'f:l:s' flag; do
+  while getopts 'l:s' flag; do
     case $flag in
-      f) filed=$OPTARG ;;
       l)
         case $OPTARG in
           emph) level=emph ;;
@@ -31,7 +29,7 @@ function writelog() {
 
   [[ ! -z $BASH_UTILS_LOG_PREFIX ]] && prefix="$BASH_UTILS_LOG_PREFIX "
   prefix="$prefix$(printf '%-8s' $level): "
-  pretix="${BASH_UTILS_PREFIX_COLOR}${prefix}${BASH_UTILS_DEFAULT_COLOR}"
+  prefix="${BASH_UTILS_PREFIX_COLOR}${prefix}${BASH_UTILS_DEFAULT_COLOR}"
 
   if [[ -f $BASH_UTILS_LOG_PATH ]]; then
     local size=$(stat -c %s $BASH_UTILS_LOG_PATH)
