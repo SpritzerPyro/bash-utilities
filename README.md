@@ -193,11 +193,13 @@ In the library `input.sh` some functions to read user input are available.
 
 #### read_string
 
-`read_string` prompts the user with the as first argument specified question and writes the answer to a variable passed as second argument. Only non empty strings are allowed as answer.
+`read_string` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
+
+Normally, the user is questioned until an answer is given. With the `-e` flag an empty input can be allowed explicitly.
 
 With the `-d` option, a default value can be specified, which is taken when the user accepts an empty line.
 
-The `-p` option, which stands for path, also resolves `~` to the user home directory.
+The `-p` option, which stands for "path", also resolves `~` to the user home directory.
 
 ```bash
 source $bash_utils_lib_dir/input.sh
@@ -205,18 +207,22 @@ source $bash_utils_lib_dir/input.sh
 read_string "Prompt for input" data1
 read_string -d "foo" "With default value" data2
 read_string -p "Prompt for a path" data3
+read_string -e "Allow empty input" data4
 
 echo "Result1: $data1"
 echo "Result2: $data2"
 echo "Result3: $data3"
+echo "Result4: $data4"
 
 # Output
 Prompt for input: bar
 With default value (foo):
 Prompt for a path: ~/foo
+Allow empty input:
 Result1: bar
 Result2: foo
 Result3: /home/user/foo
+Result4:
 ```
 
 #### read_yes_no
