@@ -40,6 +40,34 @@ _Libraries must have a `.sh` extension. The script automatically adds one if not
 
 ## Utilities
 
+### chalk.sh
+
+The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
+
+The color is defined by the specified level.
+
+| Level   | Description       | Default color |
+| ------- | ----------------- | ------------- |
+| emph    | Emphasized        | blue          |
+| error   | Indicates errors  | red           |
+| info    | Normal text       | default       |
+| success | Indicates success | green         |
+| warn    | Warning text      | yellow        |
+
+For color configuration options see [color environment variables](#colors).
+
+#### chalk
+
+The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
+
+Output can also be piped into the `chalk` command.
+
+```bash
+chalk "Lorem ipsum dolor sit amet"
+chalk -l emph "Lorem ipsum dolor sit amet"
+echo "Oh snap!" | chalk -l error
+```
+
 ### checks.sh
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
@@ -157,34 +185,6 @@ The function accepts a list of files and calls [source_dotenv](#sourcedotenv) fo
 
 ```bash
 source_dotenvs *.env .env myfile
-```
-
-### chalk.sh
-
-The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
-
-The color is defined by the specified level.
-
-| Level   | Description       | Default color |
-| ------- | ----------------- | ------------- |
-| emph    | Emphasized        | blue          |
-| error   | Indicates errors  | red           |
-| info    | Normal text       | default       |
-| success | Indicates success | green         |
-| warn    | Warning text      | yellow        |
-
-For color configuration options see [color environment variables](#colors).
-
-#### chalk
-
-The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
-
-Output can also be piped into the `chalk` command.
-
-```bash
-chalk "Lorem ipsum dolor sit amet"
-chalk -l emph "Lorem ipsum dolor sit amet"
-echo "Oh snap!" | chalk -l error
 ```
 
 ### log.sh
