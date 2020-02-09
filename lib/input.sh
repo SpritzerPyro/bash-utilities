@@ -3,14 +3,16 @@
 set -eo pipefail
 
 function read_string() {
+  local allow_empty_input
   local local_read_answer
   local local_read_default
   local OPTIND
   local path
 
-  while getopts 'd:p' flag; do
+  while getopts 'd:ep' flag; do
     case "${flag}" in
       d) local_read_default=$OPTARG ;;
+      e) allow_empty_input=true ;;
       p) path=true ;;
     esac
   done
@@ -30,14 +32,16 @@ function read_string() {
       local_read_answer=${local_read_answer:-"${local_read_default}"}
     fi
 
-    if [[ ! -z $local_read_answer ]]; then
-      if [[ $path == "true" ]]; then
-        local_read_answer=$(echo $local_read_answer | sed "s#^~#$HOME#")
-      fi
-
-      eval "$2='$local_read_answer'"
-      return
+    if [[ -z $local_read_answer ]] && [[ $allow_empty_input != "true" ]]; then
+      continue
     fi
+
+    if [[ $path == "true" ]]; then
+      local_read_answer=$(echo $local_read_answer | sed "s#^~#$HOME#")
+    fi
+
+    eval "$2='$local_read_answer'"
+    return
   done
 }
 
