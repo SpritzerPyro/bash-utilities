@@ -187,6 +187,58 @@ The function accepts a list of files and calls [source_dotenv](#sourcedotenv) fo
 source_dotenvs *.env .env myfile
 ```
 
+### input.sh
+
+In the library `input.sh` some functions to read user input are available.
+
+#### read_yes_no
+
+The `read_yes_no` function prompts the user for a yes or no question. The answer directly can be used as a boolean condition or stored into a variable.
+
+The first argument of the function is the question, the user is asked. An optional second argument is a variable the answer is written to (`yes` or `no`). If the second argument is omitted, the function returns with `0 (truthy)` for yes and `1 (falsy)` for no.
+
+```bash
+source $bash_utils_lib_dir/input.sh
+
+if read_yes_no "Make a decision" ; then
+  echo "In the 'yes' block"
+else
+  echo "In the 'no' block"
+fi
+
+read_yes_no "Fill 'foo' variable" data
+
+echo "Answer: $data"
+
+# Output for answer 'y'
+Make a decision [y|n]: y
+In the 'yes' block
+Fill some variable [y|n]: y
+Answer: yes
+
+# Output for answer 'n'
+Make a decision [y|n]: n
+In the 'no' block
+Fill some variable [y|n]: n
+Answer: no
+```
+
+The function also takes default values with the options `-y` for yes and `-n` for no.
+
+```bash
+read_yes_no -y "Default yes" data1
+read_yes_no -n "Default no" data2
+
+echo "Answer '-y': $data1"
+echo "Answer '-n': $data2"
+
+# Output
+Default yes [y|n] (y):
+Default no [y|n] (n):
+Answer '-y': yes
+Answer '-n': no
+```
+
 ### log.sh
 
 **File logs are disabled by default. Set `BASH_UTILS_LOG_PATH` to enable them.**
