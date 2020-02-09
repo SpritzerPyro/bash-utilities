@@ -191,6 +191,34 @@ source_dotenvs *.env .env myfile
 
 In the library `input.sh` some functions to read user input are available.
 
+#### read_string
+
+`read_string` prompts the user with the as first argument specified question and writes the answer to a variable passed as second argument. Only non empty strings are allowed as answer.
+
+With the `-d` option, a default value can be specified, which is taken when the user accepts an empty line.
+
+The `-p` option, which stands for path, also resolves `~` to the user home directory.
+
+```bash
+source $bash_utils_lib_dir/input.sh
+
+read_string "Prompt for input" data1
+read_string -d "foo" "With default value" data2
+read_string -p "Prompt for a path" data3
+
+echo "Result1: $data1"
+echo "Result2: $data2"
+echo "Result3: $data3"
+
+# Output
+Prompt for input: bar
+With default value (foo):
+Prompt for a path: ~/foo
+Result1: bar
+Result2: foo
+Result3: /home/user/foo
+```
+
 #### read_yes_no
 
 The `read_yes_no` function prompts the user for a yes or no question. The answer directly can be used as a boolean condition or stored into a variable.
