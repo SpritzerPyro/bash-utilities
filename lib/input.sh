@@ -3,14 +3,14 @@
 set -eo pipefail
 
 function read_yes_no() {
-  local data
-  local default
+  local local_read_answer
+  local local_read_default
   local OPTIND
 
   while getopts 'ny' flag; do
     case "${flag}" in
-      n) default="n" ;;
-      y) default="y" ;;
+      n) local_read_default="n" ;;
+      y) local_read_default="y" ;;
     esac
   done
 
@@ -18,13 +18,13 @@ function read_yes_no() {
   
   while true; do
     echo -n "${1-"Yes or no?"} [y|n]: "
-    read data
+    read local_read_answer
 
-    if [[ ! -z $default ]]; then
-      data=${data:-"${default}"}
+    if [[ ! -z $local_read_default ]]; then
+      local_read_answer=${local_read_answer:-"${local_read_default}"}
     fi
 
-    case $data in
+    case $local_read_answer in
       Y|y|yes )
         if [[ ! -z $2 ]]; then
           eval "$2='yes'"
