@@ -2,6 +2,39 @@
 
 set -eo pipefail
 
+function read_string() {
+  local local_read_answer
+  local local_read_default
+  local OPTIND
+
+  while getopts 'd:' flag; do
+    case "${flag}" in
+      d) local_read_default=$OPTARG ;;
+    esac
+  done
+
+  shift $(($OPTIND - 1))
+
+  while true; do
+    if [[ -z $local_read_default ]]; then
+      echo -n "${1-"Input"}: "
+    else
+      echo -n "${1-"Input"} ($local_read_default): "
+    fi
+
+    read local_read_answer
+
+    if [[ ! -z $local_read_default ]]; then
+      local_read_answer=${local_read_answer:-"${local_read_default}"}
+    fi
+
+    if [[ ! -z $local_read_answer ]]; then
+      eval "$2='$local_read_answer'"
+      return
+    fi
+  done
+}
+
 function read_yes_no() {
   local local_read_answer
   local local_read_default
@@ -22,6 +55,7 @@ function read_yes_no() {
     else
       echo -n "${1-"Yes or no?"} [y|n] ($local_read_default): "
     fi
+
     read local_read_answer
 
     if [[ ! -z $local_read_default ]]; then
