@@ -40,6 +40,34 @@ _Libraries must have a `.sh` extension. The script automatically adds one if not
 
 ## Utilities
 
+### chalk.sh
+
+The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
+
+The color is defined by the specified level.
+
+| Level   | Description       | Default color |
+| ------- | ----------------- | ------------- |
+| emph    | Emphasized        | blue          |
+| error   | Indicates errors  | red           |
+| info    | Normal text       | default       |
+| success | Indicates success | green         |
+| warn    | Warning text      | yellow        |
+
+For color configuration options see [color environment variables](#colors).
+
+#### chalk
+
+The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
+
+Output can also be piped into the `chalk` command.
+
+```bash
+chalk "Lorem ipsum dolor sit amet"
+chalk -l emph "Lorem ipsum dolor sit amet"
+echo "Oh snap!" | chalk -l error
+```
+
 ### checks.sh
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
@@ -159,32 +187,90 @@ The function accepts a list of files and calls [source_dotenv](#sourcedotenv) fo
 source_dotenvs *.env .env myfile
 ```
 
-### chalk.sh
+### input.sh
 
-The script `lib/chalk.sh` includes some functions to use the `echo` command using different colors.
+In the library `input.sh` some functions to read user input are available.
 
-The color is defined by the specified level.
+#### query
 
-| Level   | Description       | Default color |
-| ------- | ----------------- | ------------- |
-| emph    | Emphasized        | blue          |
-| error   | Indicates errors  | red           |
-| info    | Normal text       | default       |
-| success | Indicates success | green         |
-| warn    | Warning text      | yellow        |
+`query` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
 
-For color configuration options see [color environment variables](#colors).
+Normally, the user is questioned until an answer is given. With the `-e` flag an empty input can be allowed explicitly.
 
-#### chalk
+With the `-d` option, a default value can be specified, which is taken when the user accepts an empty line.
 
-The `chalk` command writes the specified text. The optional `-l LEVEL` flag uses a different color as described [above](#chalsh).
-
-Output can also be piped into the `chalk` command.
+The `-p` option, which stands for "path", also resolves `~` to the user home directory.
 
 ```bash
-chalk "Lorem ipsum dolor sit amet"
-chalk -l emph "Lorem ipsum dolor sit amet"
-echo "Oh snap!" | chalk -l error
+source $bash_utils_lib_dir/input.sh
+
+query "Prompt for input" data1
+query -d "foo" "With default value" data2
+query -p "Prompt for a path" data3
+query -e "Allow empty input" data4
+
+echo "Result1: $data1"
+echo "Result2: $data2"
+echo "Result3: $data3"
+echo "Result4: $data4"
+
+# Output
+Prompt for input: bar
+With default value (foo):
+Prompt for a path: ~/foo
+Allow empty input:
+Result1: bar
+Result2: foo
+Result3: /home/user/foo
+Result4:
+```
+
+#### query_yes_no
+
+The `query_yes_no` function prompts the user for a yes or no question. The answer directly can be used as a boolean condition or stored into a variable.
+
+The first argument of the function is the question, the user is asked. An optional second argument is a variable the answer is written to (`yes` or `no`). If the second argument is omitted, the function returns with `0 (truthy)` for yes and `1 (falsy)` for no.
+
+```bash
+source $bash_utils_lib_dir/input.sh
+
+if query_yes_no "Make a decision" ; then
+  echo "In the 'yes' block"
+else
+  echo "In the 'no' block"
+fi
+
+query_yes_no "Fill 'foo' variable" data
+
+echo "Answer: $data"
+
+# Output for answer 'y'
+Make a decision [y|n]: y
+In the 'yes' block
+Fill some variable [y|n]: y
+Answer: yes
+
+# Output for answer 'n'
+Make a decision [y|n]: n
+In the 'no' block
+Fill some variable [y|n]: n
+Answer: no
+```
+
+The function also takes default values with the options `-y` for yes and `-n` for no.
+
+```bash
+query_yes_no -y "Default yes" data1
+query_yes_no -n "Default no" data2
+
+echo "Answer '-y': $data1"
+echo "Answer '-n': $data2"
+
+# Output
+Default yes [y|n] (y):
+Default no [y|n] (n):
+Answer '-y': yes
+Answer '-n': no
 ```
 
 ### log.sh
