@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-function read_string() {
+function query() {
   local allow_empty_input
   local local_read_answer
   local local_read_default
@@ -45,7 +45,7 @@ function read_string() {
   done
 }
 
-function read_yes_no() {
+function query_yes_no() {
   local local_read_answer
   local local_read_default
   local OPTIND

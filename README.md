@@ -191,9 +191,9 @@ source_dotenvs *.env .env myfile
 
 In the library `input.sh` some functions to read user input are available.
 
-#### read_string
+#### query
 
-`read_string` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
+`query` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
 
 Normally, the user is questioned until an answer is given. With the `-e` flag an empty input can be allowed explicitly.
 
@@ -204,10 +204,10 @@ The `-p` option, which stands for "path", also resolves `~` to the user home dir
 ```bash
 source $bash_utils_lib_dir/input.sh
 
-read_string "Prompt for input" data1
-read_string -d "foo" "With default value" data2
-read_string -p "Prompt for a path" data3
-read_string -e "Allow empty input" data4
+query "Prompt for input" data1
+query -d "foo" "With default value" data2
+query -p "Prompt for a path" data3
+query -e "Allow empty input" data4
 
 echo "Result1: $data1"
 echo "Result2: $data2"
@@ -225,22 +225,22 @@ Result3: /home/user/foo
 Result4:
 ```
 
-#### read_yes_no
+#### query_yes_no
 
-The `read_yes_no` function prompts the user for a yes or no question. The answer directly can be used as a boolean condition or stored into a variable.
+The `query_yes_no` function prompts the user for a yes or no question. The answer directly can be used as a boolean condition or stored into a variable.
 
 The first argument of the function is the question, the user is asked. An optional second argument is a variable the answer is written to (`yes` or `no`). If the second argument is omitted, the function returns with `0 (truthy)` for yes and `1 (falsy)` for no.
 
 ```bash
 source $bash_utils_lib_dir/input.sh
 
-if read_yes_no "Make a decision" ; then
+if query_yes_no "Make a decision" ; then
   echo "In the 'yes' block"
 else
   echo "In the 'no' block"
 fi
 
-read_yes_no "Fill 'foo' variable" data
+query_yes_no "Fill 'foo' variable" data
 
 echo "Answer: $data"
 
@@ -260,8 +260,8 @@ Answer: no
 The function also takes default values with the options `-y` for yes and `-n` for no.
 
 ```bash
-read_yes_no -y "Default yes" data1
-read_yes_no -n "Default no" data2
+query_yes_no -y "Default yes" data1
+query_yes_no -n "Default no" data2
 
 echo "Answer '-y': $data1"
 echo "Answer '-n': $data2"
