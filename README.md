@@ -22,7 +22,7 @@ Options:
 
 **Option:** `-e` or `-x`
 
-An executable includes some basic variables and initially includes the `lib/log_exit_error.sh` script.
+An executable includes some basic variables and initially sources the `lib/log_exit_error.sh` script.
 
 The created file is executable.
 
@@ -30,13 +30,13 @@ _Executables should have no extension. If a `.sh` extension is declared, the scr
 
 ### Library file
 
+**Option:** `-l`
+
 A library just includes the `shebang` and `set -eo pipefail` although both are not needed.
 
 Libraries are not executable.
 
 _Libraries must have a `.sh` extension. The script automatically adds one if not declared._
-
-**Option:** `-l`
 
 ## Utilities
 
