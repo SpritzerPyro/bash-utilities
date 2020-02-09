@@ -1,0 +1,107 @@
+#!/bin/bash
+
+set -eo pipefail
+
+function usage() {
+  echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
+  echo ""
+  echo "Selecting a filetype like executable or library is mandatory!"
+  echo ""
+  echo "Options:"
+  echo -e "  -e, -x\tCreate executable script"
+  echo -e "  -h\t\tShow this information"
+  echo -e "  -l\t\tCreate library file"
+}
+
+EXECUTABLE=
+
+while getopts 'ehlx' flag; do
+  case "${flag}" in
+    e|x) EXECUTABLE=true ;;
+    h) usage && exit 0 ;;
+    l) EXECUTABLE=false ;;
+    *) usage && exit 1 ;;
+  esac
+done
+
+shift $(($OPTIND - 1))
+
+[[ -z $1 ]] && usage && exit 1;
+[[ -z $EXECUTABLE ]] && usage && exit 1;
+
+readonly current_dir=$(dirname $(readlink -f $0))
+readonly working_dir=$(readlink -f $current_dir/..)
+
+source $current_dir/../lib/chalk.sh
+
+function read_yn() {
+  local data
+
+  while true; do
+    echo -n "${1-"Yes or no?"} [y|n]: "
+    read data
+
+    case $data in
+      Y|y|yes ) return 0 ;;
+      N|n|no ) return 1 ;;
+    esac
+  done
+}
+
+ext="${1: -3}"
+name="${1}"
+  
+if [[ $EXECUTABLE != "true" ]] && [[ $ext != '.sh' ]]; then
+    name="${1}.sh"
+fi
+
+if [[ $EXECUTABLE == "true" ]] && [[ $ext == ".sh" ]]; then
+  chalk -l warn "Executables should have no extension"
+
+  if read_yn "Remove extension '.sh'?"; then
+    name="${1:0:-3}"
+  else
+    name="${1}"
+  fi
+fi
+
+if [[ -d $name ]]; then
+  chalk -l error "Specified path is a directory" >&2
+  exit 1
+fi
+
+if [[ -f $name ]]; then
+  if read_yn "Specified file already exists. Overwrite?"; then
+    rm $name
+  else
+    chalk -l warn "Omitting existing file '${name}'"
+    exit
+  fi
+fi
+
+mkdir -p $(dirname $name)
+
+readonly libpath=$(realpath --relative-to=$(dirname $name) $working_dir/lib)
+readonly target=$(readlink -f $name)
+
+echo -n "Create script $target ... "
+
+echo "#!/bin/bash" > $target
+echo "" >> $target
+echo "set -eo pipefail" >> $target
+
+if [[ $EXECUTABLE == "true" ]]; then
+  echo "" >> $target
+  echo "current_dir=\$(dirname \$(readlink -f \$0))" >> $target
+  echo "bash_utils_lib_dir=\$(readlink -f \$current_dir/$libpath)" >> $target
+  echo "" >> $target
+  echo "source \$bash_utils_lib_dir/log_exit_error.sh" >> $target
+fi
+
+if [[ $EXECUTABLE != "true" ]]; then
+  chmod -x $target
+else
+  chmod +x $target
+fi
+
+chalk -l success "done"
