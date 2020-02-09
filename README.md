@@ -4,11 +4,39 @@ A collection of some bash script utilities.
 
 ## Create a new script
 
-To create a new script with some default configuration, call `bin/createscript` followed by the path to the new file.
+To create a new script with some default configuration, call `bin/touched` followed by the type of script you want to create and the path to the new file.
 
 ```bash
-./bin/createscript path/to/file
+./bin/touch -h
+Usage: touch [OPTIONS] /path/to/file
+
+Selecting a filetype like executable or library is mandatory!
+
+Options:
+  -e, -x  Create executable script
+  -h      Show this information
+  -l      Create library file
 ```
+
+### Executable file
+
+**Option:** `-e` or `-x`
+
+An executable includes some basic variables and initially includes the `lib/log_exit_error.sh` script.
+
+The created file is executable.
+
+_Executables should have no extension. If a `.sh` extension is declared, the script asks you to remove it. Of course, you can keep the extension if you want to._
+
+### Library file
+
+A library just includes the `shebang` and `set -eo pipefail` although both are not needed.
+
+Libraries are not executable.
+
+_Libraries must have a `.sh` extension. The script automatically adds one if not declared._
+
+**Option:** `-l`
 
 ## Utilities
 
