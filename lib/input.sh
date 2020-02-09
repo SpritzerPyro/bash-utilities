@@ -25,8 +25,21 @@ function read_yes_no() {
     fi
 
     case $data in
-      Y|y|yes ) return 0 ;;
-      N|n|no ) return 1 ;;
+      Y|y|yes )
+        if [[ ! -z $2 ]]; then
+          eval "$2='yes'"
+        fi
+
+        return 0
+        ;;
+      N|n|no )
+        if [[ -z $2 ]]; then
+          return 1
+        fi
+
+        eval "$2='no'"
+        return 0
+        ;;
     esac
   done
 }
