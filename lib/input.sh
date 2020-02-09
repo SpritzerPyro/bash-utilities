@@ -17,7 +17,11 @@ function read_yes_no() {
   shift $(($OPTIND - 1))
   
   while true; do
-    echo -n "${1-"Yes or no?"} [y|n]: "
+    if [[ -z $local_read_default ]]; then
+      echo -n "${1-"Yes or no?"} [y|n]: "
+    else
+      echo -n "${1-"Yes or no?"} [y|n] ($local_read_default): "
+    fi
     read local_read_answer
 
     if [[ ! -z $local_read_default ]]; then
