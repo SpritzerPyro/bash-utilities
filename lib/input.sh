@@ -6,10 +6,12 @@ function read_string() {
   local local_read_answer
   local local_read_default
   local OPTIND
+  local path
 
-  while getopts 'd:' flag; do
+  while getopts 'd:p' flag; do
     case "${flag}" in
       d) local_read_default=$OPTARG ;;
+      p) path=true ;;
     esac
   done
 
@@ -29,6 +31,10 @@ function read_string() {
     fi
 
     if [[ ! -z $local_read_answer ]]; then
+      if [[ $path == "true" ]]; then
+        local_read_answer=$(echo $local_read_answer | sed "s#^~#$HOME#")
+      fi
+
       eval "$2='$local_read_answer'"
       return
     fi
