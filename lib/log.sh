@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source $(dirname ${BASH_SOURCE[0]:-$0})/chalk.sh
-source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/../config/log.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function writelog() {

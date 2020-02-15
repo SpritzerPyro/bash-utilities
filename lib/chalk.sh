@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $(dirname ${BASH_SOURCE[0]:-$0})/colors.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/../config/colors.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function chalk() {
