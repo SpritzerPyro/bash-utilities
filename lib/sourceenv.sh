@@ -1,14 +1,17 @@
 #!/bin/bash
 
-bash_utils_custom_env_paths=(
-  "../.bashutils.env"
-  "../.env"
-  "../../.bashutils.env"
-)
+for var in $(cat $(dirname ${BASH_SOURCE[0]:-$0})/../config/variables); do
+  [[ -n ${!var+set} ]] && continue
 
-for path in ${bash_utils_custom_env_paths[@]}; do
-  [[ ! -f $(dirname ${BASH_SOURCE[0]:-$0})/$path ]] && continue
+  for path in \
+    $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env \
+    $(dirname ${BASH_SOURCE[0]:-$0})/../../.bashutils.env \
+    $(dirname ${BASH_SOURCE[0]:-$0})/../../.env \
+    $(dirname ${BASH_SOURCE[0]:-$0})/../.bashutils.env \
+    $(dirname ${BASH_SOURCE[0]:-$0})/../.env \
+  ; do
+    [[ ! -f "$path" ]] && continue
 
-  source $(dirname ${BASH_SOURCE[0]:-$0})/$path
-  break;
+    source <(grep -E "^$var=" $path)
+  done
 done
