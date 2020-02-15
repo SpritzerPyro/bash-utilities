@@ -34,7 +34,7 @@ function writelog() {
   if [[ -f $BASH_UTILS_LOG_PATH ]]; then
     local size=$(stat -c %s $BASH_UTILS_LOG_PATH)
 
-    if [[ $size -gt $BASH_UTILS_MAX_LOG_SIZE ]]; then
+    if [[ $size -gt $BASH_UTILS_LOG_MAX_SIZE ]]; then
       local i=1
       while [[ -f $BASH_UTILS_LOG_PATH.$i ]]; do ((i=i+1)); done
       mv $BASH_UTILS_LOG_PATH $BASH_UTILS_LOG_PATH.$i

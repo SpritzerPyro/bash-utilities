@@ -286,7 +286,7 @@ BASH_UTILS_LOG_PATH=/var/log/foo.log
 BASH_UTILS_LOG_PATH=/var/log/foo.log\ /var/log/bar.log
 ```
 
-The log file rotates after reaching a size defined by `BASH_UTILS_MAX_LOG_SIZE`.
+The log file rotates after reaching a size defined by `BASH_UTILS_LOG_MAX_SIZE`.
 
 File logs additionally are prefixed with a custom string and the type of log. The prefix can be set via the `BASH_UTILS_LOG_PREFIX` variable and defaults to the current timestamp.
 
@@ -389,7 +389,7 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 
 | Variables                 | Default            | Description                                                                                                                              |
 | ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASH_UTILS_LOG_MAX_SIZE` | 20971520           | The maximum log file size                                                                                                                |
 | `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. To log to multiple files a space-separated list can be specified. An empty value disables logging. |
 | `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                                                                                        |
 | `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                                                                                       |
-| `BASH_UTILS_MAX_LOG_SIZE` | 20971520           | The maximum log file size                                                                                                                |
