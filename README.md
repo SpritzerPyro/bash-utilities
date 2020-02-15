@@ -377,13 +377,13 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 
 | Variables                  | Default    | Description                      |
 | -------------------------- | ---------- | -------------------------------- |
-| `BASH_UTILS_DEFAULT_COLOR` | \033[0m    | Color to reset after output      |
-| `BASH_UTILS_EMPH_COLOR`    | \033[0;34m | Color used for emphasized output |
-| `BASH_UTILS_ERROR_COLOR`   | \033[0;31m | Color used for error output      |
-| `BASH_UTILS_INFO_COLOR`    | \033[0m    | Color used for info output       |
-| `BASH_UTILS_PREFIX_COLOR`  | \033[0;90m | Color used for logging prefix    |
-| `BASH_UTILS_SUCCESS_COLOR` | \033[0;32m | Color used for success output    |
-| `BASH_UTILS_WARN_COLOR`    | \033[0;33m | Color used for warning output    |
+| `BASH_UTILS_COLOR_DEFAULT` | \033[0m    | Color to reset after output      |
+| `BASH_UTILS_COLOR_EMPH`    | \033[0;34m | Color used for emphasized output |
+| `BASH_UTILS_COLOR_ERROR`   | \033[0;31m | Color used for error output      |
+| `BASH_UTILS_COLOR_INFO`    | \033[0m    | Color used for info output       |
+| `BASH_UTILS_COLOR_PREFIX`  | \033[0;90m | Color used for logging prefix    |
+| `BASH_UTILS_COLOR_SUCCESS` | \033[0;32m | Color used for success output    |
+| `BASH_UTILS_COLOR_WARN`    | \033[0;33m | Color used for warning output    |
 
 ## Log
 
