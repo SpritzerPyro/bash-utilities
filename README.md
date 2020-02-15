@@ -369,7 +369,7 @@ Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
 
 The behavior of the bash utilities can be configured by setting environment variables.
 
-The utilities try to read a custom env file called `.bashutils.env` in the project root. If the file does not exist, the utilities also try to source the file from the parent directory, in case the repository is used as a git submodule. If no custom `.bashutils.env` exists, the utilities will use the default config.
+The utilities try to read custom environment variables located either in `.env` or a file called `.bashutils.env`, located in the project root or its parent directory, in case the repository is used as a git submodule. If no custom env file exists, the utilities will use the default config.
 
 ## Environment
 
