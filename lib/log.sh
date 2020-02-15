@@ -1,7 +1,7 @@
 #!/bin/bash
 
 source $(dirname ${BASH_SOURCE[0]:-$0})/chalk.sh
-source $(dirname ${BASH_SOURCE[0]:-$0})/log.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function writelog() {
@@ -29,12 +29,12 @@ function writelog() {
 
   [[ ! -z $BASH_UTILS_LOG_PREFIX ]] && prefix="$BASH_UTILS_LOG_PREFIX "
   prefix="$prefix$(printf '%-8s' $level): "
-  prefix="${BASH_UTILS_PREFIX_COLOR}${prefix}${BASH_UTILS_DEFAULT_COLOR}"
+  prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
   if [[ -f $BASH_UTILS_LOG_PATH ]]; then
     local size=$(stat -c %s $BASH_UTILS_LOG_PATH)
 
-    if [[ $size -gt $BASH_UTILS_MAX_LOG_SIZE ]]; then
+    if [[ $size -gt $BASH_UTILS_LOG_MAX_SIZE ]]; then
       local i=1
       while [[ -f $BASH_UTILS_LOG_PATH.$i ]]; do ((i=i+1)); done
       mv $BASH_UTILS_LOG_PATH $BASH_UTILS_LOG_PATH.$i

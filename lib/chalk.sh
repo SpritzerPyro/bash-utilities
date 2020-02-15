@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source $(dirname ${BASH_SOURCE[0]:-$0})/colors.env
+source $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env
 source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function chalk() {
@@ -17,11 +17,11 @@ function chalk() {
   
   if [[ $# -gt 0 ]]; then
     case $level in
-      emph) echo -e "${BASH_UTILS_EMPH_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}" ;;
-      error) echo -e "${BASH_UTILS_ERROR_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}" ;;
-      success) echo -e "${BASH_UTILS_SUCCESS_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}" ;;
-      warn | warning) echo -e "${BASH_UTILS_WARN_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}" ;;
-      *) echo -e "${BASH_UTILS_INFO_COLOR}$@${BASH_UTILS_DEFAULT_COLOR}" ;;
+      emph) echo -e "${BASH_UTILS_COLOR_EMPH}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
+      error) echo -e "${BASH_UTILS_COLOR_ERROR}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
+      success) echo -e "${BASH_UTILS_COLOR_SUCCESS}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
+      warn | warning) echo -e "${BASH_UTILS_COLOR_WARN}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
+      *) echo -e "${BASH_UTILS_COLOR_INFO}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
     esac
     
     return
@@ -29,11 +29,11 @@ function chalk() {
   
   while read data; do
     case $level in
-      emph) echo -e "${BASH_UTILS_EMPH_COLOR}$data${BASH_UTILS_DEFAULT_COLOR}" ;;
-      error) echo -e "${BASH_UTILS_ERROR_COLOR}$data${BASH_UTILS_DEFAULT_COLOR}" ;;
-      success) echo -e "${BASH_UTILS_SUCCESS_COLOR}$data${BASH_UTILS_DEFAULT_COLOR}" ;;
-      warn | warning) echo -e "${BASH_UTILS_WARN_COLOR}$data${BASH_UTILS_DEFAULT_COLOR}" ;;
-      *) echo -e "${BASH_UTILS_INFO_COLOR}$data${BASH_UTILS_DEFAULT_COLOR}" ;;
+      emph) echo -e "${BASH_UTILS_COLOR_EMPH}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
+      error) echo -e "${BASH_UTILS_COLOR_ERROR}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
+      success) echo -e "${BASH_UTILS_COLOR_SUCCESS}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
+      warn | warning) echo -e "${BASH_UTILS_COLOR_WARN}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
+      *) echo -e "${BASH_UTILS_COLOR_INFO}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
     esac
   done
 }

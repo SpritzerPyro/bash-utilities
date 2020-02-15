@@ -286,7 +286,7 @@ BASH_UTILS_LOG_PATH=/var/log/foo.log
 BASH_UTILS_LOG_PATH=/var/log/foo.log\ /var/log/bar.log
 ```
 
-The log file rotates after reaching a size defined by `BASH_UTILS_MAX_LOG_SIZE`.
+The log file rotates after reaching a size defined by `BASH_UTILS_LOG_MAX_SIZE`.
 
 File logs additionally are prefixed with a custom string and the type of log. The prefix can be set via the `BASH_UTILS_LOG_PREFIX` variable and defaults to the current timestamp.
 
@@ -369,7 +369,7 @@ Remember to set the `BASH_UTILS_LOG_PATH` variable to enable logging.
 
 The behavior of the bash utilities can be configured by setting environment variables.
 
-The utilities try to read a custom env file called `.bashutils.env` in the project root. If the file does not exist, the utilities also try to source the file from the parent directory, in case the repository is used as a git submodule. If no custom `.bashutils.env` exists, the utilities will use the default config.
+The utilities try to read custom environment variables located either in `.env` or a file called `.bashutils.env`, located in the project root or its parent directory, in case the repository is used as a git submodule. If no custom env file exists, the utilities will use the default config.
 
 ## Environment
 
@@ -377,19 +377,19 @@ The utilities try to read a custom env file called `.bashutils.env` in the proje
 
 | Variables                  | Default    | Description                      |
 | -------------------------- | ---------- | -------------------------------- |
-| `BASH_UTILS_DEFAULT_COLOR` | \033[0m    | Color to reset after output      |
-| `BASH_UTILS_EMPH_COLOR`    | \033[0;34m | Color used for emphasized output |
-| `BASH_UTILS_ERROR_COLOR`   | \033[0;31m | Color used for error output      |
-| `BASH_UTILS_INFO_COLOR`    | \033[0m    | Color used for info output       |
-| `BASH_UTILS_PREFIX_COLOR`  | \033[0;90m | Color used for logging prefix    |
-| `BASH_UTILS_SUCCESS_COLOR` | \033[0;32m | Color used for success output    |
-| `BASH_UTILS_WARN_COLOR`    | \033[0;33m | Color used for warning output    |
+| `BASH_UTILS_COLOR_DEFAULT` | \033[0m    | Color to reset after output      |
+| `BASH_UTILS_COLOR_EMPH`    | \033[0;34m | Color used for emphasized output |
+| `BASH_UTILS_COLOR_ERROR`   | \033[0;31m | Color used for error output      |
+| `BASH_UTILS_COLOR_INFO`    | \033[0m    | Color used for info output       |
+| `BASH_UTILS_COLOR_PREFIX`  | \033[0;90m | Color used for logging prefix    |
+| `BASH_UTILS_COLOR_SUCCESS` | \033[0;32m | Color used for success output    |
+| `BASH_UTILS_COLOR_WARN`    | \033[0;33m | Color used for warning output    |
 
 ## Log
 
 | Variables                 | Default            | Description                                                                                                                              |
 | ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASH_UTILS_LOG_MAX_SIZE` | 20971520           | The maximum log file size                                                                                                                |
 | `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. To log to multiple files a space-separated list can be specified. An empty value disables logging. |
 | `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                                                                                        |
 | `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                                                                                       |
-| `BASH_UTILS_MAX_LOG_SIZE` | 20971520           | The maximum log file size                                                                                                                |
