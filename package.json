@@ -1,6 +1,6 @@
 {
   "name": "@spritzerpyro/bash-utilities",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "A collection of some bash script utilities.",
   "main": "",
   "repository": "https://github.com/SpritzerPyro/bash-utilities.git",
