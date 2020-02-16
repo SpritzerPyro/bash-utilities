@@ -2,6 +2,37 @@
 
 A collection of some bash script utilities.
 
+## Installation
+
+You have several options on how to use the `bash-utitilies`. The easiest way is to simply clone the repository.
+
+```bash
+git clone https://github.com/SpritzerPyro/bash-utilities.git
+```
+
+For projects using node, you can add the `bash-utilities` GitHub package. Therefore you first have to add the GitHub package registry. Afterward, you can call `touch` using npm or yarn to create a new file.
+
+```bash
+echo "@spritzerpyro:registry=https://npm.pkg.github.com" >> .npmrc
+
+# yarn
+yarn add @spritzerpyro/bash-utilities
+yarn run touch -x path/to/file
+
+# npm
+npm install @spritzerpyro/bash-utilities
+npm run touch -x path/to/file
+```
+
+For projects not using node, you also can add the repository as submodule.
+
+```bash
+git submodule add https://github.com/SpritzerPyro/bash-utilities.git
+
+# Update submodules
+git submodule update --remote --merge
+```
+
 ## Create a new script
 
 To create a new script with some default configuration, call `bin/touched` followed by the type of script you want to create and the path to the new file.
