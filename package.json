@@ -1,0 +1,15 @@
+{
+  "name": "@spritzerpyro/bash-utilities",
+  "version": "0.6.0",
+  "description": "A collection of some bash script utilities.",
+  "main": "",
+  "repository": "https://github.com/SpritzerPyro/bash-utilities.git",
+  "author": "pueri <pyro@outlook.at>",
+  "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  },
+  "bin": {
+    "touch": "./bin/touch"
+  }
+}
