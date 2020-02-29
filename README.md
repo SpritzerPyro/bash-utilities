@@ -28,6 +28,7 @@ For projects not using node, you also can add the repository as submodule.
 
 ```bash
 git submodule add https://github.com/SpritzerPyro/bash-utilities.git
+git submodule init
 
 # Update submodules
 git submodule update --remote --merge
