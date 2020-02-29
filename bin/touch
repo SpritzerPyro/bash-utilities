@@ -8,9 +8,9 @@ function usage() {
   echo "Selecting a filetype like executable or library is mandatory!"
   echo ""
   echo "Options:"
-  echo -e "  -e, -x\tCreate executable script"
-  echo -e "  -h\t\tShow this information"
-  echo -e "  -l\t\tCreate library file"
+  echo -e "  -e, -x  Create executable script"
+  echo -e "  -h      Show this information"
+  echo -e "  -l      Create library file"
 }
 
 EXECUTABLE=
