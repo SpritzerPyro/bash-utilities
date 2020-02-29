@@ -32,7 +32,6 @@ shift $(($OPTIND - 1))
 [[ -z $EXECUTABLE ]] && usage && exit 1;
 
 readonly current_dir=$(dirname $(readlink -f $0))
-readonly working_dir=$(readlink -f $current_dir/..)
 
 source $current_dir/../lib/chalk.sh
 source $current_dir/../lib/input.sh
@@ -76,7 +75,7 @@ fi
 mkdir -p $(dirname $name)
 
 function executable_content() {
-  local libpath=$(realpath --relative-to=$(dirname $name) $working_dir/lib)
+  local libpath=$(realpath --relative-to=$(dirname $name) $current_dir/../lib)
 
   echo "#!/bin/bash"
 
