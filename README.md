@@ -38,6 +38,8 @@ git submodule update --remote --merge
 
 To create a new script with some default configuration, call `bin/touched` followed by the type of script you want to create and the path to the new file.
 
+During the creation you are prompted for a description and whether you want to include some information into the file header.
+
 ```bash
 ./bin/touch -h
 Usage: touch [OPTIONS] /path/to/file
@@ -54,7 +56,7 @@ Options:
 
 **Option:** `-e` or `-x`
 
-An executable includes some basic variables and initially sources the `lib/log_exit_error.sh` script. You are prompted for a description and whether you want to include some information into the file header.
+An executable includes some basic variables and initially sources the `lib/log_exit_error.sh` script.
 
 The created file is executable.
 
@@ -64,7 +66,7 @@ _Executables should have no extension. If a `.sh` extension is declared, the scr
 
 **Option:** `-l`
 
-Creates a library file with including an example library function and its function comment.
+Creates a library file including an example library function and its function comment.
 
 Libraries are not executable.
 
