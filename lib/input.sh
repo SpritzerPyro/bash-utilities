@@ -3,16 +3,16 @@
 set -eo pipefail
 
 function query() {
-  local allow_empty_input
   local local_read_answer
   local local_read_default
   local OPTIND
+  local optional
   local path
 
-  while getopts 'd:ep' flag; do
+  while getopts 'd:eop' flag; do
     case "${flag}" in
       d) local_read_default=$OPTARG ;;
-      e) allow_empty_input=true ;;
+      e|o) optional=true ;;
       p) path=true ;;
     esac
   done
@@ -22,6 +22,8 @@ function query() {
   while true; do
     if [[ -z $local_read_default ]]; then
       echo -n "${1-"Input"}: "
+    elif [[ "${optional}" == "true" ]]; then
+      echo -n "${1-"Input"} (optional): "
     else
       echo -n "${1-"Input"} ($local_read_default): "
     fi
@@ -32,7 +34,7 @@ function query() {
       local_read_answer=${local_read_answer:-"${local_read_default}"}
     fi
 
-    if [[ -z $local_read_answer ]] && [[ $allow_empty_input != "true" ]]; then
+    if [[ -z $local_read_answer ]] && [[ $optional != "true" ]]; then
       continue
     fi
 
