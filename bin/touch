@@ -40,39 +40,40 @@ author_email=
 author_name=
 copyright=
 description=
-ext="${1: -3}"
-name="${1}"
-  
-if [[ $EXECUTABLE != "true" ]] && [[ $ext != '.sh' ]]; then
+name=
+
+function handle_path() {
+  name="${1}"
+
+  local extension="${name: -3}"
+
+  if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
     name="${1}.sh"
-fi
-
-if [[ $EXECUTABLE == "true" ]] && [[ $ext == ".sh" ]]; then
-  chalk -l warn "Executables should have no extension"
-
-  if query_yes_no "Remove extension '.sh'?"; then
-    name="${1:0:-3}"
-  else
-    name="${1}"
   fi
-fi
-
-if [[ -d $name ]]; then
-  chalk -l error "Specified path is a directory" >&2
-  exit 1
-fi
-
-if [[ -f $name ]]; then
-  if query_yes_no "Specified file already exists. Overwrite?"; then
-    chalk -l warn "Removing existing file '${name}'"
-    rm $name
-  else
+  
+  if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
+    chalk -l warn "Executables should have no extension"
+  
+    if query_yes_no "Remove extension '.sh'?"; then
+      name="${1:0:-3}"
+    else
+      name="${1}"
+    fi
+  fi
+  
+  if [[ -d $name ]]; then
+    chalk -l error "Specified path is a directory" >&2
+    exit 1
+  fi
+  
+  if
+    [[ -f $name ]] && \
+    ! query_yes_no "Specified file already exists. Overwrite?"
+  then
     chalk -l warn "Omitting existing file '${name}'"
     exit
   fi
-fi
-
-mkdir -p $(dirname $name)
+}
 
 function executable_content() {
   local libpath=$(realpath --relative-to=$(dirname $name) $current_dir/../lib)
@@ -129,18 +130,23 @@ function query_header() {
 }
 
 function main() {
+  handle_path $1
+
   local target=$(readlink -f $name)
+
+  mkdir -p $(dirname $target)
+  rm -f $target
   
   if [[ $EXECUTABLE == "true" ]]; then
     query_header
     executable_content > $target
     chmod +x $target
+    chalk -l success "Successfully created executable '${target}'"
   else
     touch $target
     chmod -x $target
+    chalk -l success "Successfully created library file '${target}'"
   fi
-  
-  chalk -l success "done"
 }
 
 main "$@"
