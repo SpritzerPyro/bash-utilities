@@ -53,7 +53,7 @@ Options:
 
 **Option:** `-e` or `-x`
 
-An executable includes some basic variables and initially sources the `lib/log_exit_error.sh` script.
+An executable includes some basic variables and initially sources the `lib/log_exit_error.sh` script. You are prompted for a description and whether you want to include some information into the file header.
 
 The created file is executable.
 
@@ -63,7 +63,7 @@ _Executables should have no extension. If a `.sh` extension is declared, the scr
 
 **Option:** `-l`
 
-A library just includes the `shebang` and `set -eo pipefail` although both are not needed.
+Creates a library file with including an example library function and its function comment.
 
 Libraries are not executable.
 
