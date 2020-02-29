@@ -319,7 +319,7 @@ BASH_UTILS_LOG_PATH=/var/log/foo.log\ /var/log/bar.log
 
 The log file rotates after reaching a size defined by `BASH_UTILS_LOG_MAX_SIZE`.
 
-File logs additionally are prefixed with a custom string and the type of log. The prefix can be set via the `BASH_UTILS_LOG_PREFIX` variable and defaults to the current timestamp.
+File logs additionally are prefixed with a timestamp and the type of log. The format of the timestamp can be set via the `BASH_UTILS_LOG_TIME_FORMAT` variable and defaults to an ISO 8601 string. An empty value for `BASH_UTILS_TIME_FORMAT` disables using a timestamp.
 
 #### log
 
@@ -418,9 +418,9 @@ The utilities try to read custom environment variables located either in `.env` 
 
 ## Log
 
-| Variables                 | Default            | Description                                                                                                                              |
-| ------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `BASH_UTILS_LOG_MAX_SIZE` | 20971520           | The maximum log file size                                                                                                                |
-| `BASH_UTILS_LOG_PATH`     |                    | File written to by logging utilities. To log to multiple files a space-separated list can be specified. An empty value disables logging. |
-| `BASH_UTILS_LOG_PREFIX`   | [$(date "+%F %T")] | Prefix used for log file entries.                                                                                                        |
-| `BASH_UTILS_LOG_STDERR`   |                    | Disables logging of stderr output.                                                                                                       |
+| Variables                    | Default  | Description                                                                                                                              |
+| ---------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `BASH_UTILS_LOG_MAX_SIZE`    | 20971520 | The maximum log file size                                                                                                                |
+| `BASH_UTILS_LOG_PATH`        |          | File written to by logging utilities. To log to multiple files a space-separated list can be specified. An empty value disables logging. |
+| `BASH_UTILS_LOG_TIME_FORMAT` | "%F %T"  | The format used for the log file timestamp (see `date --help`). An empty value disables using a timestamp.                               |
+| `BASH_UTILS_LOG_STDERR`      |          | Disables logging of stderr output.                                                                                                       |
