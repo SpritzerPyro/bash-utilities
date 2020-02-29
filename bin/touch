@@ -40,43 +40,43 @@ author_email=
 author_name=
 copyright=
 description=
-name=
+filename=
 
 function handle_path() {
-  name="${1}"
+  filename="${1}"
 
-  local extension="${name: -3}"
+  local extension="${filename: -3}"
 
   if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
-    name="${1}.sh"
+    filename="${1}.sh"
   fi
   
   if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
   
     if query_yes_no "Remove extension '.sh'?"; then
-      name="${1:0:-3}"
+      filename="${1:0:-3}"
     else
-      name="${1}"
+      filename="${1}"
     fi
   fi
   
-  if [[ -d $name ]]; then
+  if [[ -d $filename ]]; then
     chalk -l error "Specified path is a directory" >&2
     exit 1
   fi
   
   if
-    [[ -f $name ]] && \
+    [[ -f $filename ]] && \
     ! query_yes_no "Specified file already exists. Overwrite?"
   then
-    chalk -l warn "Omitting existing file '${name}'"
+    chalk -l warn "Omitting existing file '${filename}'"
     exit
   fi
 }
 
 function executable_content() {
-  local libpath=$(realpath --relative-to=$(dirname $name) $current_dir/../lib)
+  local libpath=$(realpath --relative-to=$(dirname $filename) $current_dir/../lib)
 
   echo "#!/bin/bash"
 
@@ -132,7 +132,7 @@ function query_header() {
 function main() {
   handle_path $1
 
-  local target=$(readlink -f $name)
+  local target=$(readlink -f $filename)
 
   mkdir -p $(dirname $target)
   rm -f $target
