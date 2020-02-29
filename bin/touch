@@ -41,38 +41,10 @@ author_name=
 copyright=
 description=
 filename=
+libname=
 
-function handle_path() {
-  filename="${1}"
-
-  local extension="${filename: -3}"
-
-  if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
-    filename="${1}.sh"
-  fi
-  
-  if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
-    chalk -l warn "Executables should have no extension"
-  
-    if query_yes_no "Remove extension '.sh'?"; then
-      filename="${1:0:-3}"
-    else
-      filename="${1}"
-    fi
-  fi
-  
-  if [[ -d $filename ]]; then
-    chalk -l error "Specified path is a directory" >&2
-    exit 1
-  fi
-  
-  if
-    [[ -f $filename ]] && \
-    ! query_yes_no "Specified file already exists. Overwrite?"
-  then
-    chalk -l warn "Omitting existing file '${filename}'"
-    exit
-  fi
+function escape_string() {
+  echo "${1}" | tr -cs '[:alnum:]\n\r' '_' | tr '[:upper:]' '[:lower:]'
 }
 
 function executable_content() {
@@ -114,6 +86,65 @@ function executable_content() {
   echo "source \$bash_utils_lib_dir/log_exit_error.sh"
 }
 
+function handle_path() {
+  filename="${1}"
+  local extension="${filename: -3}"
+
+  if [[ $EXECUTABLE != "true" ]] && [[ $extension == '.sh' ]]; then
+    libname=$(escape_string "${filename:0:-3}")
+  fi
+
+  if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
+    libname=$(escape_string "${filename}")
+    filename="${filename}.sh"
+  fi
+  
+  if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
+    chalk -l warn "Executables should have no extension"
+  
+    if query_yes_no "Remove extension '.sh'?"; then
+      filename="${filename:0:-3}"
+    else
+      filename="${filename}"
+    fi
+  fi
+  
+  if [[ -d $filename ]]; then
+    chalk -l error "Specified path is a directory" >&2
+    exit 1
+  fi
+  
+  if
+    [[ -f $filename ]] && \
+    ! query_yes_no "Specified file already exists. Overwrite?"
+  then
+    chalk -l warn "Omitting existing file '${filename}'"
+    exit
+  fi
+}
+
+function library_content() {
+  echo "#######################################"
+  echo "# Description of the function."
+  echo "# Globals:"
+  echo "#   (List of global variables used and modified.)"
+  echo "#   BACKUP_DIR"
+  echo "# Arguments:"
+  echo "#   (Arguments taken.)"
+  echo "#   None"
+  echo "# Outputs:"
+  echo "#   (Output to STDOUT or STDERR.)"
+  echo "#   Writes location to stdout"
+  echo "# Returns:"
+  echo -n "#   (Returned values other than the default exit "
+  echo "status of the last command run.)"
+  echo "#   0 if thing was deleted, non-zero on error."
+  echo "#######################################"
+  echo "function ${libname}::my_func() {"
+  echo "  # Code"
+  echo "}"
+}
+
 function query_header() {
   query -o "Description" description
 
@@ -130,7 +161,7 @@ function query_header() {
 }
 
 function main() {
-  handle_path $1
+  handle_path "${1}"
 
   local target=$(readlink -f $filename)
 
@@ -143,7 +174,7 @@ function main() {
     chmod +x $target
     chalk -l success "Successfully created executable '${target}'"
   else
-    touch $target
+    library_content > $target
     chmod -x $target
     chalk -l success "Successfully created library file '${target}'"
   fi
