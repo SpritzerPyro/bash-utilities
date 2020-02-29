@@ -37,6 +37,10 @@ readonly working_dir=$(readlink -f $current_dir/..)
 source $current_dir/../lib/chalk.sh
 source $current_dir/../lib/input.sh
 
+author_email=
+author_name=
+copyright=
+description=
 ext="${1: -3}"
 name="${1}"
   
@@ -71,27 +75,73 @@ fi
 
 mkdir -p $(dirname $name)
 
-readonly libpath=$(realpath --relative-to=$(dirname $name) $working_dir/lib)
-readonly target=$(readlink -f $name)
+function executable_content() {
+  local libpath=$(realpath --relative-to=$(dirname $name) $working_dir/lib)
 
-echo -n "Create script $target ... "
+  echo "#!/bin/bash"
 
-echo "#!/bin/bash" > $target
-echo "" >> $target
-echo "set -eo pipefail" >> $target
+  if [[ ! -z "${description}" ]]; then
+    echo "#"
+    echo "# ${description}"
+  fi
 
-if [[ $EXECUTABLE == "true" ]]; then
-  echo "" >> $target
-  echo "current_dir=\$(dirname \$(readlink -f \$0))" >> $target
-  echo "bash_utils_lib_dir=\$(readlink -f \$current_dir/$libpath)" >> $target
-  echo "" >> $target
-  echo "source \$bash_utils_lib_dir/log_exit_error.sh" >> $target
-fi
+  if
+    [[ ! -z "${author_email}" ]] || \
+    [[ ! -z "${author_name}" ]] || \
+    [[ ! -z "${copyright}" ]]
+  then
+    echo "#"
+  fi
 
-if [[ $EXECUTABLE != "true" ]]; then
-  chmod -x $target
-else
-  chmod +x $target
-fi
+  if [[ ! -z "${copyright}" ]]; then
+    echo "# Copyright ${copyright}"
+  fi
 
-chalk -l success "done"
+  if [[ ! -z "${author_email}" ]] || [[ ! -z "${author_name}" ]]; then
+    if [[ ! -z "${author_email}" ]]; then
+      echo "# Author: ${author_email} (${author_name})"
+    else
+      echo "# Author: ${author_name}"
+    fi
+  fi
+
+  echo ""
+  echo "set -eo pipefail"
+  echo ""
+  echo "readonly current_dir=\$(dirname \$(readlink -f \$0))"
+  echo "readonly bash_utils_lib_dir=\$(readlink -f \$current_dir/${libpath})"
+  echo ""
+  echo "source \$bash_utils_lib_dir/log_exit_error.sh"
+}
+
+function query_header() {
+  query -o "Description" description
+
+  if query_yes_no -n "Add author information"; then
+    query -o "Author email" author_email
+    query -d "${USER}" "Author name" author_name
+  fi
+
+  if query_yes_no -n "Add copyright information"; then
+    query -d "$(date +'%Y') ${author_name:-$USER}" \
+      "Copyright information" \
+      copyright
+  fi
+}
+
+function main() {
+  local target=$(readlink -f $name)
+  
+  if [[ $EXECUTABLE == "true" ]]; then
+    query_header
+    executable_content > $target
+    chmod +x $target
+  else
+    touch $target
+    chmod -x $target
+  fi
+  
+  chalk -l success "done"
+}
+
+main "$@"
