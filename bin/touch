@@ -43,6 +43,34 @@ description=
 filename=
 libname=
 
+function create_header() {
+  if [[ ! -z "${description}" ]]; then
+    echo "# ${description}"
+  fi
+
+  if
+    [[ ! -z "${description}" ]] && (
+      [[ ! -z "${author_email}" ]] || \
+      [[ ! -z "${author_name}" ]] || \
+      [[ ! -z "${copyright}" ]]
+    )
+  then
+    echo "#"
+  fi
+
+  if [[ ! -z "${copyright}" ]]; then
+    echo "# Copyright ${copyright}"
+  fi
+
+  if [[ ! -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+    echo "# Author: ${author_email} (${author_name})"
+  fi
+
+  if [[ -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+    echo "# Author: ${author_name}"
+  fi
+}
+
 function escape_string() {
   echo "${1}" | tr -cs '[:alnum:]\n\r' '_' | tr '[:upper:]' '[:lower:]'
 }
@@ -52,29 +80,9 @@ function executable_content() {
 
   echo "#!/bin/bash"
 
-  if [[ ! -z "${description}" ]]; then
+  if [[ ! -z "$(create_header)" ]]; then
     echo "#"
-    echo "# ${description}"
-  fi
-
-  if
-    [[ ! -z "${author_email}" ]] || \
-    [[ ! -z "${author_name}" ]] || \
-    [[ ! -z "${copyright}" ]]
-  then
-    echo "#"
-  fi
-
-  if [[ ! -z "${copyright}" ]]; then
-    echo "# Copyright ${copyright}"
-  fi
-
-  if [[ ! -z "${author_email}" ]] || [[ ! -z "${author_name}" ]]; then
-    if [[ ! -z "${author_email}" ]]; then
-      echo "# Author: ${author_email} (${author_name})"
-    else
-      echo "# Author: ${author_name}"
-    fi
+    create_header
   fi
 
   echo ""
@@ -124,6 +132,11 @@ function handle_path() {
 }
 
 function library_content() {
+  if [[ ! -z "$(create_header)" ]]; then
+    create_header
+    echo ""
+  fi
+
   echo "#######################################"
   echo "# Description of the function."
   echo "# Globals:"
@@ -167,9 +180,10 @@ function main() {
 
   mkdir -p $(dirname $target)
   rm -f $target
+
+  query_header
   
   if [[ $EXECUTABLE == "true" ]]; then
-    query_header
     executable_content > $target
     chmod +x $target
     chalk -l success "Successfully created executable '${target}'"
