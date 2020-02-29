@@ -106,6 +106,20 @@ echo "Oh snap!" | chalk -l error
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
+#### is_false
+
+Returns `0` (truthy) if the passed argument equals `false` or `0`.
+
+```bash
+is_false 0       # 0 (truthy)
+is_false false   # 0 (truthy)
+is_false "0"     # 0 (truthy)
+is_false "false" # 0 (truthy)
+
+is_false ""      # 1 (falsy)
+is_false foo     # 1 (falsy)
+```
+
 #### is_true
 
 Returns `0` (truthy) if the passed argument equals `true` or `1`.
@@ -120,18 +134,29 @@ is_true ""      # 1 (falsy)
 is_true foo     # 1 (falsy)
 ```
 
-#### is_false
+#### is_valid_email
 
-Returns `0` (truthy) if the passed argument equals `false` or `0`.
+The function `is_valid_email` can be used to very basically check whether a string is a valid email. It only checks if the string includes the `@` and does not contain whitespaces.
+
+Returns `0` (truthy) if the passed argument is considered valid and `1` (falsy) if not.
 
 ```bash
-is_false 0       # 0 (truthy)
-is_false false   # 0 (truthy)
-is_false "0"     # 0 (truthy)
-is_false "false" # 0 (truthy)
+is_valid_email "test@example"      # 0 (truthy)
+is_valid_email "test@example.org"  # 0 (truthy)
+is_valid_email "test.foo@example"  # 0 (truthy)
 
-is_false ""      # 1 (falsy)
-is_false foo     # 1 (falsy)
+is_valid_email " test@example"     # 1 (falsy)
+is_valid_email "testexample "      # 1 (falsy)
+is_valid_email "test@exam ple"     # 1 (falsy)
+
+# Do not forget to quote the argument
+email="test@exam ple"
+
+# Correct usage, "test@exam ple" is validated
+is_valid_email "${email}" # 1 (falsy)
+
+# Wrong usage because only "test@exam" is validated
+is_valid_email $email # 0 (truthy)
 ```
 
 ### docker.sh
