@@ -27,7 +27,10 @@ function writelog() {
 
   shift $(($OPTIND - 1))
 
-  [[ ! -z $BASH_UTILS_LOG_PREFIX ]] && prefix="$BASH_UTILS_LOG_PREFIX "
+  if [[ ! -z "${BASH_UTILS_LOG_TIME_FORMAT}" ]]; then
+    prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
+  fi
+
   prefix="$prefix$(printf '%-8s' $level): "
   prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
