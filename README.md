@@ -254,11 +254,13 @@ In the library `input.sh` some functions to read user input are available.
 
 `query` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
 
-Normally, the user is questioned until an answer is given. With the `-e` flag an empty input can be allowed explicitly.
+Normally, the user is questioned until an answer is given. With the `-o` (optional) flag an empty input can be allowed explicitly.
 
-With the `-d` option, a default value can be specified, which is taken when the user accepts an empty line.
+With the `-d` (default) option, a default value can be specified, which is taken when the user accepts an empty line.
 
-The `-p` option, which stands for "path", also resolves `~` to the user home directory.
+Passing `-e` (email) checks the input if it is a valid email address.
+
+The `-p` (path) option, which stands for "path", also resolves `~` to the user home directory.
 
 ```bash
 source $bash_utils_lib_dir/input.sh
@@ -266,7 +268,7 @@ source $bash_utils_lib_dir/input.sh
 query "Prompt for input" data1
 query -d "foo" "With default value" data2
 query -p "Prompt for a path" data3
-query -e "Allow empty input" data4
+query -o "Allow empty input" data4
 
 echo "Result1: $data1"
 echo "Result2: $data2"
