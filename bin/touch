@@ -8,9 +8,9 @@ function usage() {
   echo "Selecting a filetype like executable or library is mandatory!"
   echo ""
   echo "Options:"
-  echo -e "  -e, -x\tCreate executable script"
-  echo -e "  -h\t\tShow this information"
-  echo -e "  -l\t\tCreate library file"
+  echo -e "  -e, -x  Create executable script"
+  echo -e "  -h      Show this information"
+  echo -e "  -l      Create library file"
 }
 
 EXECUTABLE=
@@ -24,84 +24,182 @@ while getopts 'ehlx' flag; do
   esac
 done
 
+readonly EXECUTABLE
+
 shift $(($OPTIND - 1))
 
 [[ -z $1 ]] && usage && exit 1;
 [[ -z $EXECUTABLE ]] && usage && exit 1;
 
 readonly current_dir=$(dirname $(readlink -f $0))
-readonly working_dir=$(readlink -f $current_dir/..)
 
 source $current_dir/../lib/chalk.sh
+source $current_dir/../lib/input.sh
 
-function read_yn() {
-  local data
+author_email=
+author_name=
+copyright=
+description=
+filename=
+libname=
 
-  while true; do
-    echo -n "${1-"Yes or no?"} [y|n]: "
-    read data
+function create_header() {
+  if [[ ! -z "${description}" ]]; then
+    echo "# ${description}"
+  fi
 
-    case $data in
-      Y|y|yes ) return 0 ;;
-      N|n|no ) return 1 ;;
-    esac
-  done
+  if
+    [[ ! -z "${description}" ]] && (
+      [[ ! -z "${author_email}" ]] || \
+      [[ ! -z "${author_name}" ]] || \
+      [[ ! -z "${copyright}" ]]
+    )
+  then
+    echo "#"
+  fi
+
+  if [[ ! -z "${copyright}" ]]; then
+    echo "# Copyright ${copyright}"
+  fi
+
+  if [[ ! -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+    echo "# Author: ${author_email} (${author_name})"
+  fi
+
+  if [[ -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+    echo "# Author: ${author_name}"
+  fi
 }
 
-ext="${1: -3}"
-name="${1}"
-  
-if [[ $EXECUTABLE != "true" ]] && [[ $ext != '.sh' ]]; then
-    name="${1}.sh"
-fi
+function escape_string() {
+  echo "$(basename "$1")" \
+    | tr -cs '[:alnum:]\n\r' '_' \
+    | tr '[:upper:]' '[:lower:]'
+}
 
-if [[ $EXECUTABLE == "true" ]] && [[ $ext == ".sh" ]]; then
-  chalk -l warn "Executables should have no extension"
+function executable_content() {
+  local libpath=$(realpath --relative-to=$(dirname $filename) $current_dir/../lib)
 
-  if read_yn "Remove extension '.sh'?"; then
-    name="${1:0:-3}"
-  else
-    name="${1}"
+  echo "#!/bin/bash"
+
+  if [[ ! -z "$(create_header)" ]]; then
+    echo "#"
+    create_header
   fi
-fi
 
-if [[ -d $name ]]; then
-  chalk -l error "Specified path is a directory" >&2
-  exit 1
-fi
+  echo ""
+  echo "set -eo pipefail"
+  echo ""
+  echo "readonly current_dir=\$(dirname \$(readlink -f \$0))"
+  echo "readonly bash_utils_lib_dir=\$(readlink -f \$current_dir/${libpath})"
+  echo ""
+  echo "source \$bash_utils_lib_dir/log_exit_error.sh"
+  echo ""
+  echo "function main() {"
+  echo "  echo \"Hello world\""
+  echo "}"
+  echo ""
+  echo 'main "$@"'
+}
 
-if [[ -f $name ]]; then
-  if read_yn "Specified file already exists. Overwrite?"; then
-    rm $name
-  else
-    chalk -l warn "Omitting existing file '${name}'"
+function handle_path() {
+  filename="${1}"
+  local extension="${filename: -3}"
+
+  if [[ $EXECUTABLE != "true" ]] && [[ $extension == '.sh' ]]; then
+    libname=$(escape_string "${filename:0:-3}")
+  fi
+
+  if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
+    libname=$(escape_string "${filename}")
+    filename="${filename}.sh"
+  fi
+  
+  if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
+    chalk -l warn "Executables should have no extension"
+  
+    if query_yes_no "Remove extension '.sh'?"; then
+      filename="${filename:0:-3}"
+    else
+      filename="${filename}"
+    fi
+  fi
+  
+  if [[ -d $filename ]]; then
+    chalk -l error "Specified path is a directory" >&2
+    exit 1
+  fi
+  
+  if
+    [[ -f $filename ]] && \
+    ! query_yes_no "Specified file already exists. Overwrite?"
+  then
+    chalk -l warn "Omitting existing file '${filename}'"
     exit
   fi
-fi
+}
 
-mkdir -p $(dirname $name)
+function library_content() {
+  if [[ ! -z "$(create_header)" ]]; then
+    create_header
+    echo ""
+  fi
 
-readonly libpath=$(realpath --relative-to=$(dirname $name) $working_dir/lib)
-readonly target=$(readlink -f $name)
+  echo "#######################################"
+  echo "# Description of the function."
+  echo "# Globals:"
+  echo "#   (List of global variables used and modified.)"
+  echo "#   BACKUP_DIR"
+  echo "# Arguments:"
+  echo "#   (Arguments taken.)"
+  echo "#   None"
+  echo "# Outputs:"
+  echo "#   (Output to STDOUT or STDERR.)"
+  echo "#   Writes location to stdout"
+  echo "# Returns:"
+  echo -n "#   (Returned values other than the default exit "
+  echo "status of the last command run.)"
+  echo "#   0 if thing was deleted, non-zero on error."
+  echo "#######################################"
+  echo "function ${libname}::my_func() {"
+  echo "  echo \"Hello world\""
+  echo "}"
+}
 
-echo -n "Create script $target ... "
+function query_header() {
+  query -o "Description" description
 
-echo "#!/bin/bash" > $target
-echo "" >> $target
-echo "set -eo pipefail" >> $target
+  if query_yes_no -n "Add author information"; then
+    query -o "Author email" author_email
+    query -d "${USER}" "Author name" author_name
+  fi
 
-if [[ $EXECUTABLE == "true" ]]; then
-  echo "" >> $target
-  echo "current_dir=\$(dirname \$(readlink -f \$0))" >> $target
-  echo "bash_utils_lib_dir=\$(readlink -f \$current_dir/$libpath)" >> $target
-  echo "" >> $target
-  echo "source \$bash_utils_lib_dir/log_exit_error.sh" >> $target
-fi
+  if query_yes_no -n "Add copyright information"; then
+    query -d "$(date +'%Y') ${author_name:-$USER}" \
+      "Copyright information" \
+      copyright
+  fi
+}
 
-if [[ $EXECUTABLE != "true" ]]; then
-  chmod -x $target
-else
-  chmod +x $target
-fi
+function main() {
+  handle_path "${1}"
 
-chalk -l success "done"
+  mkdir -p "$(dirname "$1")"
+  rm -f "$1"
+
+  local target=$(readlink -f $filename)
+
+  query_header
+  
+  if [[ $EXECUTABLE == "true" ]]; then
+    executable_content > $target
+    chmod +x $target
+    chalk -l success "Successfully created executable '${target}'"
+  else
+    library_content > $target
+    chmod -x $target
+    chalk -l success "Successfully created library file '${target}'"
+  fi
+}
+
+main "$@"

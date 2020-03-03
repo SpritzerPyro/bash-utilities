@@ -28,6 +28,7 @@ For projects not using node, you also can add the repository as submodule.
 
 ```bash
 git submodule add https://github.com/SpritzerPyro/bash-utilities.git
+git submodule init
 
 # Update submodules
 git submodule update --remote --merge
@@ -36,6 +37,8 @@ git submodule update --remote --merge
 ## Create a new script
 
 To create a new script with some default configuration, call `bin/touched` followed by the type of script you want to create and the path to the new file.
+
+During the creation you are prompted for a description and whether you want to include some information into the file header.
 
 ```bash
 ./bin/touch -h
@@ -63,7 +66,7 @@ _Executables should have no extension. If a `.sh` extension is declared, the scr
 
 **Option:** `-l`
 
-A library just includes the `shebang` and `set -eo pipefail` although both are not needed.
+Creates a library file including an example library function and its function comment.
 
 Libraries are not executable.
 
@@ -103,6 +106,20 @@ echo "Oh snap!" | chalk -l error
 
 The file `lib/checks.sh` includes utilities to use as an expression in statements.
 
+#### is_false
+
+Returns `0` (truthy) if the passed argument equals `false` or `0`.
+
+```bash
+is_false 0       # 0 (truthy)
+is_false false   # 0 (truthy)
+is_false "0"     # 0 (truthy)
+is_false "false" # 0 (truthy)
+
+is_false ""      # 1 (falsy)
+is_false foo     # 1 (falsy)
+```
+
 #### is_true
 
 Returns `0` (truthy) if the passed argument equals `true` or `1`.
@@ -117,18 +134,29 @@ is_true ""      # 1 (falsy)
 is_true foo     # 1 (falsy)
 ```
 
-#### is_false
+#### is_valid_email
 
-Returns `0` (truthy) if the passed argument equals `false` or `0`.
+The function `is_valid_email` can be used to very basically check whether a string is a valid email. It only checks if the string includes the `@` and does not contain whitespaces.
+
+Returns `0` (truthy) if the passed argument is considered valid and `1` (falsy) if not.
 
 ```bash
-is_false 0       # 0 (truthy)
-is_false false   # 0 (truthy)
-is_false "0"     # 0 (truthy)
-is_false "false" # 0 (truthy)
+is_valid_email "test@example"      # 0 (truthy)
+is_valid_email "test@example.org"  # 0 (truthy)
+is_valid_email "test.foo@example"  # 0 (truthy)
 
-is_false ""      # 1 (falsy)
-is_false foo     # 1 (falsy)
+is_valid_email " test@example"     # 1 (falsy)
+is_valid_email "testexample "      # 1 (falsy)
+is_valid_email "test@exam ple"     # 1 (falsy)
+
+# Do not forget to quote the argument
+email="test@exam ple"
+
+# Correct usage, "test@exam ple" is validated
+is_valid_email "${email}" # 1 (falsy)
+
+# Wrong usage because only "test@exam" is validated
+is_valid_email $email # 0 (truthy)
 ```
 
 ### docker.sh
@@ -226,11 +254,13 @@ In the library `input.sh` some functions to read user input are available.
 
 `query` prompts the user with the as first argument specified question and writes the answer to a variable passed as the second argument.
 
-Normally, the user is questioned until an answer is given. With the `-e` flag an empty input can be allowed explicitly.
+Normally, the user is questioned until an answer is given. With the `-o` (optional) flag an empty input can be allowed explicitly.
 
-With the `-d` option, a default value can be specified, which is taken when the user accepts an empty line.
+With the `-d` (default) option, a default value can be specified, which is taken when the user accepts an empty line.
 
-The `-p` option, which stands for "path", also resolves `~` to the user home directory.
+Passing `-e` (email) checks the input if it is a valid email address.
+
+The `-p` (path) option, which stands for "path", also resolves `~` to the user home directory.
 
 ```bash
 source $bash_utils_lib_dir/input.sh
@@ -238,7 +268,7 @@ source $bash_utils_lib_dir/input.sh
 query "Prompt for input" data1
 query -d "foo" "With default value" data2
 query -p "Prompt for a path" data3
-query -e "Allow empty input" data4
+query -o "Allow empty input" data4
 
 echo "Result1: $data1"
 echo "Result2: $data2"
