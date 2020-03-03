@@ -92,6 +92,12 @@ function executable_content() {
   echo "readonly bash_utils_lib_dir=\$(readlink -f \$current_dir/${libpath})"
   echo ""
   echo "source \$bash_utils_lib_dir/log_exit_error.sh"
+  echo ""
+  echo "function main() {"
+  echo "  echo \"Hello world\""
+  echo "}"
+  echo ""
+  echo 'main "$@"'
 }
 
 function handle_path() {
