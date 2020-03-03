@@ -2,30 +2,34 @@
 
 set -eo pipefail
 
+source "$(dirname "${BASH_SOURCE[0]}")/checks.sh"
+
 function query() {
+  local email
   local local_read_answer
   local local_read_default
-  local OPTIND
+  local OPTARG OPTIND
   local optional
   local path
 
   while getopts 'd:eop' flag; do
     case "${flag}" in
-      d) local_read_default=$OPTARG ;;
-      e|o) optional=true ;;
-      p) path=true ;;
+      d) local_read_default="${OPTARG}" ;;
+      e) email="true" ;;
+      o) optional="true" ;;
+      p) path="true" ;;
     esac
   done
 
   shift $(($OPTIND - 1))
 
   while true; do
-    if [[ -z $local_read_default ]]; then
-      echo -n "${1-"Input"}: "
+    if [[ ! -z $local_read_default ]]; then
+      echo -n "${1-"Input"} ($local_read_default): "
     elif [[ "${optional}" == "true" ]]; then
       echo -n "${1-"Input"} (optional): "
     else
-      echo -n "${1-"Input"} ($local_read_default): "
+      echo -n "${1-"Input"}: "
     fi
 
     read local_read_answer
@@ -35,6 +39,16 @@ function query() {
     fi
 
     if [[ -z $local_read_answer ]] && [[ $optional != "true" ]]; then
+      echo "Required"
+      continue
+    fi
+
+    if
+      [[ "${email}" == "true" ]] && \
+      ! is_valid_email "${local_read_answer}" && \
+      ([[ ! -z "${local_read_answer}" ]] || [[ "${optional}" != "true" ]])
+    then
+      echo "Invalid email"
       continue
     fi
 
