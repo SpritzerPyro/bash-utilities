@@ -72,7 +72,9 @@ function create_header() {
 }
 
 function escape_string() {
-  echo "${1}" | tr -cs '[:alnum:]\n\r' '_' | tr '[:upper:]' '[:lower:]'
+  echo "$(basename "$1")" \
+    | tr -cs '[:alnum:]\n\r' '_' \
+    | tr '[:upper:]' '[:lower:]'
 }
 
 function executable_content() {
@@ -160,7 +162,7 @@ function library_content() {
   echo "#   0 if thing was deleted, non-zero on error."
   echo "#######################################"
   echo "function ${libname}::my_func() {"
-  echo "  # Code"
+  echo "  echo \"Hello world\""
   echo "}"
 }
 
@@ -182,10 +184,10 @@ function query_header() {
 function main() {
   handle_path "${1}"
 
-  local target=$(readlink -f $filename)
+  mkdir -p "$(dirname "$1")"
+  rm -f "$1"
 
-  mkdir -p $(dirname $target)
-  rm -f $target
+  local target=$(readlink -f $filename)
 
   query_header
   
