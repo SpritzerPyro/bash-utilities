@@ -1,107 +1,139 @@
-#!/bin/bash
-
-set -eo pipefail
-
 source "$(dirname "${BASH_SOURCE[0]}")/checks.sh"
 
 function query() {
-  local email
-  local local_read_answer
-  local local_read_default
   local OPTARG OPTIND
-  local optional
-  local path
+  local qry_answer qry_default qry_email qry_optional qry_path
+  local qry_variable="input"
 
-  while getopts 'd:eop' flag; do
+  while getopts 'd:eopv:' flag; do
     case "${flag}" in
-      d) local_read_default="${OPTARG}" ;;
-      e) email="true" ;;
-      o) optional="true" ;;
-      p) path="true" ;;
+      d) echo $OPTARG && qry_default="${OPTARG}" ;;
+      e) qry_email="true" ;;
+      o) qry_optional="true" ;;
+      p) qry_path="true" ;;
+      v) qry_variable="${OPTARG}" ;;
     esac
   done
 
   shift $(($OPTIND - 1))
 
+  local qry_question="${@:-"Input"}"
+
   while true; do
-    if [[ ! -z $local_read_default ]]; then
-      echo -n "${1-"Input"} ($local_read_default): "
-    elif [[ "${optional}" == "true" ]]; then
-      echo -n "${1-"Input"} (optional): "
+    if [[ ! -z "${qry_default}" ]]; then
+      echo -n "${qry_question} (${qry_default}): "
+    elif [[ "${qry_optional}" == "true" ]]; then
+      echo -n "${qry_question} (optional): "
     else
-      echo -n "${1-"Input"}: "
+      echo -n "${qry_question}: "
     fi
 
-    read local_read_answer
+    read qry_answer
 
-    if [[ ! -z $local_read_default ]]; then
-      local_read_answer=${local_read_answer:-"${local_read_default}"}
+    if [[ ! -z "${qry_default}" ]]; then
+      qry_answer="${qry_answer:-"${qry_default}"}"
     fi
 
-    if [[ -z $local_read_answer ]] && [[ $optional != "true" ]]; then
+    if [[ -z "${qry_answer}" ]] && [[ "${qry_optional}" != "true" ]]; then
       echo "Required"
       continue
     fi
 
     if
-      [[ "${email}" == "true" ]] && \
-      ! is_valid_email "${local_read_answer}" && \
-      ([[ ! -z "${local_read_answer}" ]] || [[ "${optional}" != "true" ]])
+      [[ "${qry_email}" == "true" ]] && \
+      ! is_valid_email "${qry_answer}" && \
+      ([[ ! -z "${qry_answer}" ]] || [[ "${qry_optional}" != "true" ]])
     then
       echo "Invalid email"
       continue
     fi
 
-    if [[ $path == "true" ]]; then
-      local_read_answer=$(echo $local_read_answer | sed "s#^~#$HOME#")
+    if [[ "${qry_path}" == "true" ]]; then
+      qry_answer="$(echo "${qry_answer}" | sed "s#^~#${HOME}#")"
     fi
 
-    eval "$2='$local_read_answer'"
+    eval "${qry_variable}='${qry_answer}'"
     return
   done
 }
 
-function query_yes_no() {
-  local local_read_answer
-  local local_read_default
-  local OPTIND
+function query::email() {
+  local qry_flags=(-e)
+  local OPTARG OPTIND
 
-  while getopts 'ny' flag; do
+  while getopts 'd:ov:' flag; do
     case "${flag}" in
-      n) local_read_default="n" ;;
-      y) local_read_default="y" ;;
+      d) qry_flags+=(-d "${OPTARG}") ;;
+      o) qry_flags+=(-o) ;;
+      v) qry_flags+=(-v "${OPTARG}") ;;
     esac
   done
 
   shift $(($OPTIND - 1))
+
+  query "${qry_flags[@]}" "$@"
+}
+
+function query::path() {
+  local qry_flags=(-p)
+  local OPTARG OPTIND
+
+  while getopts 'd:ov:' flag; do
+    case "${flag}" in
+      d) qry_flags+=(-d "${OPTARG}") ;;
+      o) qry_flags+=(-o) ;;
+      v) qry_flags+=(-v "${OPTARG}") ;;
+    esac
+  done
+
+  shift $(($OPTIND - 1))
+
+  query "${qry_flags[@]}" "$@"
+}
+
+function query::polar() {
+  local OPTARG OPTIND
+  local qry_answer qry_default qry_variable
+
+  while getopts 'nv:y' flag; do
+    case "${flag}" in
+      n) qry_default="no" ;;
+      v) qry_variable="${OPTARG}" ;;
+      y) qry_default="yes" ;;
+    esac
+  done
+
+  shift $(($OPTIND - 1))
+
+  local qry_question="${@:-"Input"} (yes|no)"
   
   while true; do
-    if [[ -z $local_read_default ]]; then
-      echo -n "${1-"Yes or no?"} [y|n]: "
+    if [[ -z "${qry_default}" ]]; then
+      echo -n "${qry_question}: "
     else
-      echo -n "${1-"Yes or no?"} [y|n] ($local_read_default): "
+      echo -n "${qry_question} (${qry_default}): "
     fi
 
-    read local_read_answer
+    read qry_answer
 
-    if [[ ! -z $local_read_default ]]; then
-      local_read_answer=${local_read_answer:-"${local_read_default}"}
+    if [[ ! -z "${qry_default}" ]]; then
+      qry_answer="${qry_answer:-"${qry_default}"}"
     fi
 
-    case $local_read_answer in
+    case "${qry_answer}" in
       Y|y|yes )
-        if [[ ! -z $2 ]]; then
-          eval "$2='yes'"
+        if [[ ! -z "${qry_variable}" ]]; then
+          eval "${qry_variable}='yes'"
         fi
 
         return 0
         ;;
       N|n|no )
-        if [[ -z $2 ]]; then
+        if [[ -z "${qry_variable}" ]]; then
           return 1
         fi
 
-        eval "$2='no'"
+        eval "${qry_variable}='no'"
         return 0
         ;;
     esac
