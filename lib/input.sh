@@ -41,7 +41,7 @@ function query() {
 
     if
       [[ "${qry_email}" == "true" ]] && \
-      ! is_valid_email "${qry_answer}" && \
+      ! check::email "${qry_answer}" && \
       ([[ ! -z "${qry_answer}" ]] || [[ "${qry_optional}" != "true" ]])
     then
       echo "Invalid email"

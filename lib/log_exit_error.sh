@@ -21,6 +21,6 @@ function log_errexit_trap() {
   echo "$caller_path exited with code $1" | log -l error
 }
 
-is_false $BASH_UTILS_LOG_STDERR || exec 2> >(read_and_log_stderr)
+check::false $BASH_UTILS_LOG_STDERR || exec 2> >(read_and_log_stderr)
 
 trap 'log_errexit_trap $?' EXIT

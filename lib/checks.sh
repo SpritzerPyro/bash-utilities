@@ -1,13 +1,11 @@
-#!/bin/bash
+function check::email() {
+  [[ "$1" =~ ^[^[:space:]]+@[^[:space:]]+$ ]]
+}
 
-function is_false() {
+function check::false() {
   [[ "$1" == "0" ]] || [[ "$1" == "false" ]]
 }
 
-function is_true() {
+function check::true() {
   [[ "$1" == "1" ]] || [[ "$1" == "true" ]]
-}
-
-function is_valid_email() {
-  [[ "${1}" =~ ^[^[:space:]]+@[^[:space:]]+$ ]]
 }
