@@ -1,8 +1,3 @@
-#!/bin/bash
-
-source $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env
-source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
-
 function chalk() {
   local level=info
   local OPTIND

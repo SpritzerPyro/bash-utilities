@@ -1,8 +1,4 @@
-#!/bin/bash
-
-source $(dirname ${BASH_SOURCE[0]:-$0})/chalk.sh
-source $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env
-source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
+source $(dirname ${BASH_SOURCE[0]})/chalk.sh
 
 function writelog() {
   local level=info
@@ -101,4 +97,12 @@ function log_native() {
   writelog "Run $info"
   tee -a $BASH_UTILS_LOG_PATH
   writelog "Finished $info"
+}
+
+function log::set() {
+  BASH_UTILS_LOG_PATH="$@"
+
+  exec 2> >(while read line; do echo "${line}" | log -l error; done)
+
+  trap 'config::exit_trap $?' EXIT
 }
