@@ -1,55 +1,43 @@
-#!/bin/bash
+function dotenv::grep() {
+  local OPTIND flag
+  local regex="^\s*(export\s+)?[a-zA-Z_]+[a-zA-Z0-9_]*=[a-zA-Z0-9_]*"
+  local flags=(--directories='skip' --extended-regexp --no-filename)
 
-function dotenv_is_valid() {
-  local data=$(grep -Ev "^(\S+=|#|$)" $1 || true)
-
-  [[ -z $data ]]
-}
-
-function export_dotenv() {
-  if [[ ! -f $1 ]]; then
-    echo "export_dotenv: File '$1' does not exist" >&2
-    return 1
-  fi
-
-  if ! dotenv_is_valid $1; then
-    echo "export_dotenv: File '$1' is not a valid dotenv file" >&2
-    return 1
-  fi
-
-  set -a
-  source $1
-  set +a
-}
-
-function export_dotenvs() {
-  for i in $@; do
-    [[ ! -f $i ]] && continue
-    export_dotenv $i
+  while getopts 's' flag; do
+    case "${flag}" in
+      s) flags+=(--no-messages) ;;
+    esac
   done
-}
 
-function export_to_env() {
-  grep -E "^export\s\S+=" $1 | sed 's/export\s//'
-}
+  shift $(($OPTIND - 1))
 
-function source_dotenv() {
-  if [[ ! -f $1 ]]; then
-    echo "source_dotenv: File '$1' does not exist" >&2
+  if [[ -z "$@" ]] && (( "${#flags[@]}" < 4 )); then
+    echo "dotenv::grep: No files specified" >&2
     return 1
   fi
 
-  if ! dotenv_is_valid $1; then
-    echo "source_dotenv: File '$1' is not a valid dotenv file" >&2
-    return 1
-  fi
+  local res=$(grep "${flags[@]}" "${regex}" ${@:-""} || echo "")
 
-  source $1
+  echo "${res}" | sed -E 's/^\s*(export\s+)?//'
 }
 
-function source_dotenvs() {
-  for i in $@; do
-    [[ ! -f $i ]] && continue
-    source_dotenv $i
+function dotenv::source() {
+  local OPTIND flag
+  local allexport
+  local grep_flags=()
+  
+  while getopts 'as' flag; do
+    case "${flag}" in
+      a) allexport="true" ;;
+      s) grep_flags+=(-s) ;;
+    esac
   done
+  
+  shift $(($OPTIND - 1))
+
+  if [[ "${allexport}" == "true" ]]; then set -a; fi
+
+  source <(dotenv::grep "${grep_flags[@]}" "${@}")
+
+  if [[ "${allexport}" == "true" ]]; then set +a; fi
 }
