@@ -29,3 +29,24 @@ function chalk() {
     echo "${flags[@]}" "${color}${data}${default_color}"
   done
 }
+
+function chalk::init() {
+  local color
+
+  for color in emph error info success warn warning; do
+    eval "function chalk::${color}() {
+      local flags=(-l ${color})
+      local OPTIND
+
+      while getopts 'n' flag; do
+        case \"\${flag}\" in
+          n) flags+=(\"-\${flag}\") ;;
+        esac
+      done
+
+      shift \$((\$OPTIND - 1))
+
+      chalk \"\${flags[@]}\" \"\$@\"
+    }"
+  done
+}
