@@ -10,6 +10,10 @@ function butils::import() {
   local lib_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
 
   case "$1" in
+    chalk)
+      source "${lib_dir}/log.sh"
+      chalk::init
+      ;;
     log)
       source "${lib_dir}/log.sh"
       log::set "${BASH_UTILS_LOG_PATH}"
