@@ -33,8 +33,10 @@ shift $(($OPTIND - 1))
 
 readonly current_dir=$(dirname $(readlink -f $0))
 
-source $current_dir/../lib/chalk.sh
-source $current_dir/../lib/input.sh
+source $current_dir/../lib/init.sh
+
+butils::import chalk
+butils::import input
 
 author_email=
 author_name=
