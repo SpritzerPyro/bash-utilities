@@ -115,22 +115,22 @@ function handle_path() {
     libname=$(escape_string "${filename}")
     filename="${filename}.sh"
   fi
-  
+
   if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
-  
+
     if query::polar "Remove extension '.sh'?"; then
       filename="${filename:0:-3}"
     else
       filename="${filename}"
     fi
   fi
-  
+
   if [[ -d $filename ]]; then
     chalk -l error "Specified path is a directory" >&2
     exit 1
   fi
-  
+
   if
     [[ -f $filename ]] && \
     ! query::polar "Specified file already exists. Overwrite?"
@@ -191,7 +191,7 @@ function main() {
   local target=$(readlink -f $filename)
 
   query_header
-  
+
   if [[ $EXECUTABLE == "true" ]]; then
     executable_content > $target
     chmod +x $target

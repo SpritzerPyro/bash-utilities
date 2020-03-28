@@ -12,7 +12,7 @@ function config::source() {
 
   for var in $(cat "${butils_dir}/config/variables"); do
     [[ -n "${!var+set}" ]] && continue
-  
+
     for path in \
       "${butils_dir}/config/default.env" \
       "${butils_dir}/../.bashutils.env" \
@@ -21,7 +21,7 @@ function config::source() {
       "${butils_dir}/.env" \
     ; do
       [[ ! -f "${path}" ]] && continue
-  
+
       source <(grep -E "^${var}=" "${path}")
     done
   done

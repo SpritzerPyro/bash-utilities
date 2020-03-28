@@ -106,7 +106,7 @@ function query::polar() {
   shift $(($OPTIND - 1))
 
   local qry_question="${@:-"Input"} (yes|no)"
-  
+
   while true; do
     if [[ -z "${qry_default}" ]]; then
       echo -n "${qry_question}: "

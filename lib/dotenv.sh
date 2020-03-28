@@ -25,14 +25,14 @@ function dotenv::source() {
   local OPTIND flag
   local allexport
   local grep_flags=()
-  
+
   while getopts 'as' flag; do
     case "${flag}" in
       a) allexport="true" ;;
       s) grep_flags+=(-s) ;;
     esac
   done
-  
+
   shift $(($OPTIND - 1))
 
   if [[ "${allexport}" == "true" ]]; then set -a; fi

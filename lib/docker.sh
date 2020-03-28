@@ -21,6 +21,6 @@ function docker_compose_export_pid {
   local service_name=${1:?$usage}
   local export_path=${2:?$usage}
   local service_pid=$(docker_compose_service_pid $1 $3)
-  
+
   echo $service_pid > $export_path
 }
