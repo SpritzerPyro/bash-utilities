@@ -8,21 +8,18 @@ function config::exit_trap() {
 }
 
 function config::source() {
-  local butils_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")"
+  local -r butils_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")
+
+  source "${butils_dir}/lib/dotenv.sh"
 
   for var in $(cat "${butils_dir}/config/variables"); do
     [[ -n "${!var+set}" ]] && continue
 
-    for path in \
+    dotenv::source -s -v "${var}" \
       "${butils_dir}/config/default.env" \
       "${butils_dir}/../.bashutils.env" \
       "${butils_dir}/../.env" \
       "${butils_dir}/.bashutils.env" \
-      "${butils_dir}/.env" \
-    ; do
-      [[ ! -f "${path}" ]] && continue
-
-      source <(grep -E "^${var}=" "${path}")
-    done
+      "${butils_dir}/.env"
   done
 }
