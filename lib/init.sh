@@ -1,13 +1,11 @@
 function butils::init() {
-  lib_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
-
-  source "${lib_dir}/config.sh"
+  butils::import config
 
   config::source
 }
 
 function butils::import() {
-  local lib_dir="$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")"
+  local -r lib_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 
   case "$1" in
     chalk)
