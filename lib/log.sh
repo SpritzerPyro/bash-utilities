@@ -6,17 +6,24 @@ source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
 
 function writelog() {
   local level=info
+  local severity=info
   local OPTIND
   local prefix=""
-  
+
   while getopts 'l:s' flag; do
     case $flag in
       l)
         case $OPTARG in
           emph) level=emph ;;
-          error) level=error ;;
+          error)
+            level=error
+            severity=error
+            ;;
           success) level=success ;;
-          warn | warning) level=warning ;;
+          warn | warning)
+            level=warning
+            severity=warninig
+            ;;
           *) level=info ;;
         esac
         ;;
@@ -31,7 +38,7 @@ function writelog() {
     prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
   fi
 
-  prefix="$prefix$(printf '%-8s' $level): "
+  prefix="$prefix$(printf '%-8s' "${severity}"): "
   prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
   if [[ -f $BASH_UTILS_LOG_PATH ]]; then
@@ -48,12 +55,12 @@ function writelog() {
     mkdir -p $(dirname $BASH_UTILS_LOG_PATH)
     touch $BASH_UTILS_LOG_PATH
   fi
-  
+
   if [[ $# -gt 0 ]]; then
     echo -e "$prefix$(echo $@ | chalk -l $level)" | tee -a $BASH_UTILS_LOG_PATH >/dev/null
     return
   fi
-  
+
   while read data; do
     echo -e "$prefix$(echo $data | chalk -l $level)" | tee -a $BASH_UTILS_LOG_PATH >/dev/null
   done
