@@ -22,7 +22,7 @@ function writelog() {
           success) level=success ;;
           warn | warning)
             level=warning
-            severity=warninig
+            severity=warning
             ;;
           *) level=info ;;
         esac
