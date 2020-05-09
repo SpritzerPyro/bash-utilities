@@ -1,5 +1,42 @@
 source $(dirname ${BASH_SOURCE[0]})/chalk.sh
 
+function log() {
+  local chalk=false level=info silent=false
+  local flag OPTARG OPTIND
+
+  while getopts 'cl:s' flag; do
+    case "${flag}" in
+      c) chalk=true ;;
+      l) level="${OPTARG}" ;;
+      s) silent=true ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  if (( $# > 0 )); then
+    if [[ "${silent}" != "true" ]]; then
+      chalk -l "${level}" "$@"
+    fi
+
+    if [[ "${chalk}" != "true" ]]; then
+      log::write -l "${level}" "$@"
+    fi
+
+    return
+  fi
+
+  while read data; do
+    if [[ "${silent}" != "true" ]]; then
+      chalk -l "${level}" "${data}"
+    fi
+
+    if [[ "${chalk}" != "true" ]]; then
+      log::write -l "${level}" "${data}"
+    fi
+  done
+}
+
 function log::write() {
   [[ -z "${BASH_UTILS_LOG_PATH}" ]] && return
 
@@ -58,34 +95,6 @@ function log::write() {
   while read data; do
     echo -e "${prefix}$(chalk -l "${level[color]}" "${data}")" \
       | tee -a $BASH_UTILS_LOG_PATH >/dev/null
-  done
-}
-
-function log() {
-  local chalk=false
-  local level=info
-  local OPTIND
-  local silent=false
-
-  while getopts 'cl:s' flag; do
-    case $flag in
-      c) chalk=true ;;
-      l) level=$OPTARG ;;
-      s) silent=true ;;
-    esac
-  done
-
-  shift $(($OPTIND - 1))
-
-  if [[ $# -gt 0 ]]; then
-    [[ $silent != "true" ]] && echo $@ | chalk -l $level
-    [[ $chalk != "true" ]] && echo $@ | log::write -l $level
-    return
-  fi
-
-  while read data; do
-    [[ $silent != "true" ]] && echo $data | chalk -l $level
-    [[ $chalk != "true" ]] && echo $data | log::write -l $level
   done
 }
 
