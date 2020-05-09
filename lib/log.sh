@@ -1,6 +1,6 @@
 source $(dirname ${BASH_SOURCE[0]})/chalk.sh
 
-function writelog() {
+function log::write() {
   local level=info
   local severity=info
   local OPTIND
@@ -80,13 +80,13 @@ function log() {
 
   if [[ $# -gt 0 ]]; then
     [[ $silent != "true" ]] && echo $@ | chalk -l $level
-    [[ $chalk != "true" ]] && echo $@ | writelog -l $level
+    [[ $chalk != "true" ]] && echo $@ | log::write -l $level
     return
   fi
 
   while read data; do
     [[ $silent != "true" ]] && echo $data | chalk -l $level
-    [[ $chalk != "true" ]] && echo $data | writelog -l $level
+    [[ $chalk != "true" ]] && echo $data | log::write -l $level
   done
 }
 
@@ -94,9 +94,9 @@ function log_native() {
   [[ ! -z $@ ]] && local info="'$@'"
   local info=${info:-command}
 
-  writelog "Run $info"
+  log::write "Run $info"
   tee -a $BASH_UTILS_LOG_PATH
-  writelog "Finished $info"
+  log::write "Finished $info"
 }
 
 function log::set() {
