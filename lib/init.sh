@@ -1,7 +1,5 @@
 function butils::init() {
   butils::import config
-
-  config::source
 }
 
 function butils::import() {
@@ -11,6 +9,11 @@ function butils::import() {
     chalk)
       source "${lib_dir}/log.sh"
       chalk::init
+      ;;
+    config)
+      source "${lib_dir}/config.sh"
+      config::init
+      config::source
       ;;
     log)
       source "${lib_dir}/log.sh"
