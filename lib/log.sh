@@ -36,6 +36,7 @@ function log::write() {
         case "${OPTARG}" in
           emph) level[color]=emph ;;
           error) level=([color]=error [severity]=error) ;;
+          off) return ;;
           success) level[color]=success ;;
           warn | warning) level=([color]=warn [severity]=warn) ;;
         esac
