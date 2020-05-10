@@ -1,5 +1,3 @@
-source $(dirname ${BASH_SOURCE[0]})/chalk.sh
-
 function log() {
   local chalk=false level=info silent=false
   local flag OPTARG OPTIND
