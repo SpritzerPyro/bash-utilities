@@ -1,13 +1,10 @@
-function config::init() {
+function config::init_dirs() {
   export USER="${USER:-"${LOGNAME}"}"
 
   declare -A -g DIRS
   local -r home_dir="${HOME:-"/home/${USER}"}"
-  local -r lib_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
   local -r media_dir="/media/${USER}"
 
-  DIRS[butils_lib]="${lib_dir}"
-  DIRS[butils]=$(readlink -f "${lib_dir}/..")
   DIRS[script]=$(dirname $(readlink -f "$0"))
   DIRS[working]=$(pwd)
 
@@ -20,19 +17,37 @@ function config::init() {
   fi
 }
 
-function config::source() {
-  local -r butils_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")/..")
+function config::init_log() {
+  local i
+  declare -A -g BASH_UTILS_LOG_COLORS
+  declare -A -g BASH_UTILS_LOG_LEVELS=(
+    [debug]=debug
+    [emph]=info
+    [error]=error
+    [info]=info
+    [success]=info
+    [warn]=warn
+  )
 
-  source "${butils_dir}/lib/dotenv.sh"
+  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
+    local varname="BASH_UTILS_COLOR_${i^^}"
+    BASH_UTILS_LOG_COLORS["${i}"]="${!varname:-"${BASH_UTILS_COLOR_DEFAULT}"}"
+  done
+}
 
-  for var in $(cat "${butils_dir}/config/variables"); do
+function config::source {
+  local -r cfg_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../config)
+  local var
+
+  for var in $(cat "${cfg_dir}/variables"); do
     [[ -n "${!var+set}" ]] && continue
 
-    dotenv::source -s -v "${var}" \
-      "${butils_dir}/config/default.env" \
-      "${butils_dir}/../.bashutils.env" \
-      "${butils_dir}/../.env" \
-      "${butils_dir}/.bashutils.env" \
-      "${butils_dir}/.env"
+    source <(grep -s "^${var}=" "${cfg_dir}/default.env")
   done
+}
+
+function config::init {
+  config::source
+  config::init_dirs
+  config::init_log
 }

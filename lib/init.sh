@@ -13,7 +13,6 @@ function butils::import() {
     config)
       source "${lib_dir}/config.sh"
       config::init
-      config::source
       ;;
     log)
       source "${lib_dir}/chalk.sh"
