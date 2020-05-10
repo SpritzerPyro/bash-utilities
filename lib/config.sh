@@ -21,12 +21,12 @@ function config::init_log() {
   local i
   declare -A -g BASH_UTILS_LOG_COLORS
   declare -A -g BASH_UTILS_LOG_LEVELS=(
-    [debug]=debug
-    [emph]=info
-    [error]=error
-    [info]=info
-    [success]=info
-    [warn]=warn
+    [debug]=DEBUG
+    [emph]=INFO
+    [error]=ERROR
+    [info]=INFO
+    [success]=INFO
+    [warn]=WARN
   )
 
   for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
