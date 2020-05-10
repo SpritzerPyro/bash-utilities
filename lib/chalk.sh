@@ -2,17 +2,16 @@ function chalk() {
   local color="${BASH_UTILS_COLOR_INFO}"
   local default_color="${BASH_UTILS_COLOR_DEFAULT}"
   local flags=(-e)
-  local OPTARG OPTIND
+  local OPTARG OPTIND i
 
   while getopts 'l:n' flag; do
     case "${flag}" in
-      l) 
-        case "${OPTARG}" in
-          emph) color="${BASH_UTILS_COLOR_EMPH}" ;;
-          error) color="${BASH_UTILS_COLOR_ERROR}" ;;
-          success) color="${BASH_UTILS_COLOR_SUCCESS}" ;;
-          warn | warning) color="${BASH_UTILS_COLOR_WARN}" ;;
-        esac
+      l)
+        for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
+          [[ "${i}" != "${OPTARG}" ]] && continue
+
+          color="${BASH_UTILS_LOG_COLORS["${i}"]}"
+        done
         ;;
       n) flags+=("-${flag}") ;;
     esac
@@ -33,7 +32,7 @@ function chalk() {
 function chalk::init() {
   local color
 
-  for color in emph error info success warn warning; do
+  for color in ${!BASH_UTILS_LOG_COLORS[@]}; do
     eval "function chalk::${color}() {
       local flags=(-l ${color})
       local OPTIND
@@ -44,7 +43,7 @@ function chalk::init() {
         esac
       done
 
-      shift \$((\$OPTIND - 1))
+      shift \$(( \$OPTIND - 1 ))
 
       chalk \"\${flags[@]}\" \"\$@\"
     }"
