@@ -63,7 +63,7 @@ function log::write() {
     prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
   fi
 
-  prefix="${prefix}$(printf '%-6s' "${level[severity]}"): "
+  prefix="${prefix}$(printf '%-5s' "${level[severity]^^}") : "
   prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
   if [[ -f "${BASH_UTILS_LOG_PATH}" ]]; then
