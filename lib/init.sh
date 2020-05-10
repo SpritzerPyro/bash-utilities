@@ -7,7 +7,7 @@ function butils::import() {
 
   case "$1" in
     chalk)
-      source "${lib_dir}/log.sh"
+      source "${lib_dir}/chalk.sh"
       chalk::init
       ;;
     config)
