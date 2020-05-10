@@ -1,37 +1,25 @@
 function log() {
-  local chalk=false level=info silent=false
   local flag OPTARG OPTIND
+  local level=info
 
-  while getopts 'cl:s' flag; do
+  while getopts 'l:' flag; do
     case "${flag}" in
-      c) chalk=true ;;
       l) level="${OPTARG}" ;;
-      s) silent=true ;;
     esac
   done
 
   shift $(( ${OPTIND} - 1 ))
 
   if (( $# > 0 )); then
-    if [[ "${silent}" != "true" ]]; then
-      chalk -l "${level}" "$@"
-    fi
-
-    if [[ "${chalk}" != "true" ]]; then
-      log::write -l "${level}" "$@"
-    fi
+    chalk -l "${level}" "$@"
+    log::write -l "${level}" "$@"
 
     return
   fi
 
   while read data; do
-    if [[ "${silent}" != "true" ]]; then
-      chalk -l "${level}" "${data}"
-    fi
-
-    if [[ "${chalk}" != "true" ]]; then
-      log::write -l "${level}" "${data}"
-    fi
+    chalk -l "${level}" "${data}"
+    log::write -l "${level}" "${data}"
   done
 }
 
@@ -65,7 +53,7 @@ function log::write() {
   prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
   if [[ -f "${BASH_UTILS_LOG_PATH}" ]]; then
-    local size=$(stat -c %s $BASH_UTILS_LOG_PATH)
+    local size=$(stat -c %s "${BASH_UTILS_LOG_PATH}")
 
     if (( ${size} > ${BASH_UTILS_LOG_MAX_SIZE} )); then
       local i=1
@@ -92,7 +80,7 @@ function log::write() {
 
   while read data; do
     echo -e "${prefix}$(chalk -l "${level[color]}" "${data}")" \
-      | tee -a $BASH_UTILS_LOG_PATH >/dev/null
+      | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
   done
 }
 
