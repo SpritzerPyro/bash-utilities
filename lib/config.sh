@@ -1,3 +1,24 @@
+function config::get_log_level() {
+  local level=info
+  local color="${BASH_UTILS_LOG_COLORS["${level}"]}"
+  local key="${BASH_UTILS_LOG_LEVELS["${level}"]}"
+
+  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
+    [[ "$2" != "${i}" ]] && continue
+
+    level="${i}"
+    key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
+  done
+
+  for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
+    [[ "$2" != "${i}" ]] && continue
+
+    color="${BASH_UTILS_LOG_COLORS["${i}"]}"
+  done
+
+  eval "$1=([color]=\"${color}\" [level]=\"${level}\" [key]=\"${key}\")"
+}
+
 function config::init_dirs() {
   export USER="${USER:-"${LOGNAME}"}"
 
