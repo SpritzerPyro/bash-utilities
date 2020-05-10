@@ -23,6 +23,15 @@ function log() {
   done
 }
 
+function log::exit_trap() {
+  [[ $1 == "0" ]] && return 0
+
+  IFS=' ' read -ra caller_array <<< "$(caller)"
+  caller_path=$(readlink -f "${caller_array[1]}")
+
+  echo "${caller_path} exited with code $1" | log -l error
+}
+
 function log::write() {
   [[ -z "${BASH_UTILS_LOG_PATH}" ]] && return
 
@@ -99,5 +108,5 @@ function log::set() {
 
   exec 2> >(while read line; do echo "${line}" | log -l error; done)
 
-  trap 'config::exit_trap $?' EXIT
+  trap 'log::exit_trap $?' EXIT
 }

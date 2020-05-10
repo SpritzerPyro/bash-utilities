@@ -1,12 +1,3 @@
-function config::exit_trap() {
-  [[ $1 == "0" ]] && return 0
-
-  IFS=' ' read -ra caller_array <<< "$(caller)"
-  caller_path=$(readlink -f "${caller_array[1]}")
-
-  echo "${caller_path} exited with code $1" | log -l error
-}
-
 function config::init() {
   export USER="${USER:-"${LOGNAME}"}"
 
