@@ -26,12 +26,12 @@ function dotenv::grep() {
 
 function dotenv::source() {
   local OPTARG OPTIND flag
-  local allexport
+  local allexport=false
   local grep_flags=()
 
   while getopts 'aisv:' flag; do
     case "${flag}" in
-      a) allexport="true" ;;
+      a) allexport=true ;;
       i|s) grep_flags+=("-${flag}") ;;
       v) grep_flags+=("-v${OPTARG}") ;;
     esac
