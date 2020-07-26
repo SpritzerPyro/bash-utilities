@@ -1,18 +1,10 @@
 function chalk() {
-  local color="${BASH_UTILS_COLOR_INFO}"
-  local default_color="${BASH_UTILS_COLOR_DEFAULT}"
-  local flags=(-e)
-  local OPTARG OPTIND i
+  local -A level
+  local OPTARG OPTIND flags=(-e)
 
   while getopts 'l:n' flag; do
     case "${flag}" in
-      l)
-        for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
-          [[ "${i}" != "${OPTARG}" ]] && continue
-
-          color="${BASH_UTILS_LOG_COLORS["${i}"]}"
-        done
-        ;;
+      l) config::get_log_level level "${OPTARG}" ;;
       n) flags+=("-${flag}") ;;
     esac
   done
@@ -20,12 +12,12 @@ function chalk() {
   shift $(($OPTIND - 1))
 
   if (( "$#" > 0 )); then
-    echo "${flags[@]}" "${color}$@${default_color}"
+    echo "${flags[@]}" "${level[color]}$@${BASH_UTILS_COLOR_DEFAULT}"
     return
   fi
 
   while read data; do
-    echo "${flags[@]}" "${color}${data}${default_color}"
+    echo "${flags[@]}" "${level[color]}${data}${BASH_UTILS_COLOR_DEFAULT}"
   done
 }
 
