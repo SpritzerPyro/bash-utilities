@@ -12,7 +12,7 @@ function chalk() {
 
   shift $(($OPTIND - 1))
 
-  config::get_log_level level "${arg}"
+  config::log_info level "${arg}"
 
   if (( "$#" > 0 )); then
     echo "${flags[@]}" "${level[color]}$@${BASH_UTILS_COLOR_DEFAULT}"

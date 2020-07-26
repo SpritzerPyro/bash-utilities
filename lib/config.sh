@@ -1,24 +1,3 @@
-function config::get_log_level() {
-  local _level=info
-  local _color="${BASH_UTILS_LOG_COLORS["${_level}"]}"
-  local _key="${BASH_UTILS_LOG_LEVELS["${_level}"]}"
-
-  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
-    [[ "$2" != "${i}" ]] && continue
-
-    _level="${i}"
-    _key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
-  done
-
-  for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
-    [[ "$2" != "${i}" ]] && continue
-
-    _color="${BASH_UTILS_LOG_COLORS["${i}"]}"
-  done
-
-  eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
-}
-
 function config::init_dirs() {
   export USER="${USER:-"${LOGNAME}"}"
 
@@ -54,6 +33,27 @@ function config::init_log() {
     local varname="BASH_UTILS_COLOR_${i^^}"
     BASH_UTILS_LOG_COLORS["${i}"]="${!varname:-"${BASH_UTILS_COLOR_DEFAULT}"}"
   done
+}
+
+function config::log_info() {
+  local _level=info
+  local _color="${BASH_UTILS_LOG_COLORS["${_level}"]}"
+  local _key="${BASH_UTILS_LOG_LEVELS["${_level}"]}"
+
+  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
+    [[ "$2" != "${i}" ]] && continue
+
+    _level="${i}"
+    _key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
+  done
+
+  for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
+    [[ "$2" != "${i}" ]] && continue
+
+    _color="${BASH_UTILS_LOG_COLORS["${i}"]}"
+  done
+
+  eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
 }
 
 function config::source {

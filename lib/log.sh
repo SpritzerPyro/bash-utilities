@@ -67,7 +67,7 @@ function log::write() {
 
   shift $(( ${OPTIND} - 1 ))
 
-  config::get_log_level level "${arg}"
+  config::log_info level "${arg}"
 
   if [[ ! -z "${BASH_UTILS_LOG_TIME_FORMAT}" ]]; then
     prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
