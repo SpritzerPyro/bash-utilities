@@ -1,39 +1,48 @@
-#!/bin/bash
-
-source $(dirname ${BASH_SOURCE[0]:-$0})/../config/default.env
-source $(dirname ${BASH_SOURCE[0]:-$0})/sourceenv.sh
-
 function chalk() {
-  local level=info
-  local OPTIND
-  
-  while getopts 'l:' flag; do
-    case $flag in
-      l) level=$OPTARG ;;
+  local flag OPTARG OPTIND
+  local -A info
+  local flags=(-e)
+  local level="info"
+
+  while getopts 'l:n' flag; do
+    case "${flag}" in
+      l) level="${OPTARG}" ;;
+      n) flags+=("-${flag}") ;;
     esac
   done
-  
-  shift $(($OPTIND - 1))
-  
-  if [[ $# -gt 0 ]]; then
-    case $level in
-      emph) echo -e "${BASH_UTILS_COLOR_EMPH}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
-      error) echo -e "${BASH_UTILS_COLOR_ERROR}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
-      success) echo -e "${BASH_UTILS_COLOR_SUCCESS}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
-      warn | warning) echo -e "${BASH_UTILS_COLOR_WARN}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
-      *) echo -e "${BASH_UTILS_COLOR_INFO}$@${BASH_UTILS_COLOR_DEFAULT}" ;;
-    esac
-    
+
+  shift $(( ${OPTIND} - 1 ))
+
+  config::log_info info "${level}"
+
+  if (( "$#" > 0 )); then
+    echo "${flags[@]}" "${info[color]}$@${BUTILS_COLORS[default]}"
+
     return
   fi
-  
+
   while read data; do
-    case $level in
-      emph) echo -e "${BASH_UTILS_COLOR_EMPH}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
-      error) echo -e "${BASH_UTILS_COLOR_ERROR}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
-      success) echo -e "${BASH_UTILS_COLOR_SUCCESS}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
-      warn | warning) echo -e "${BASH_UTILS_COLOR_WARN}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
-      *) echo -e "${BASH_UTILS_COLOR_INFO}$data${BASH_UTILS_COLOR_DEFAULT}" ;;
-    esac
+    echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLORS[default]}"
+  done
+}
+
+function chalk::init() {
+  local level
+
+  for level in ${!BUTILS_LOG_LEVELS[@]}; do
+    eval "function chalk::${level}() {
+      local flags=(-l ${level})
+      local OPTIND
+
+      while getopts 'n' flag; do
+        case \"\${flag}\" in
+          n) flags+=(\"-\${flag}\") ;;
+        esac
+      done
+
+      shift \$(( \${OPTIND} - 1 ))
+
+      chalk \"\${flags[@]}\" \"\$@\"
+    }"
   done
 }

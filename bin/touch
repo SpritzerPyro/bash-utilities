@@ -33,8 +33,10 @@ shift $(($OPTIND - 1))
 
 readonly current_dir=$(dirname $(readlink -f $0))
 
-source $current_dir/../lib/chalk.sh
-source $current_dir/../lib/input.sh
+source $current_dir/../lib/init.sh
+
+butils::use chalk
+butils::use query
 
 author_email=
 author_name=
@@ -90,12 +92,11 @@ function executable_content() {
   echo ""
   echo "set -eo pipefail"
   echo ""
-  echo "readonly current_dir=\$(dirname \$(readlink -f \$0))"
-  echo "readonly bash_utils_lib_dir=\$(readlink -f \$current_dir/${libpath})"
-  echo ""
-  echo "source \$bash_utils_lib_dir/log_exit_error.sh"
-  echo ""
   echo "function main() {"
+  echo "  local -r current_dir=\$(readlink -f \$(dirname \"\${BASH_SOURCE[0]}\"))"
+  echo ""
+  echo "  source \"\${current_dir}/${libpath}/init.sh\""
+  echo ""
   echo "  echo \"Hello world\""
   echo "}"
   echo ""
@@ -114,25 +115,25 @@ function handle_path() {
     libname=$(escape_string "${filename}")
     filename="${filename}.sh"
   fi
-  
+
   if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
-  
-    if query_yes_no "Remove extension '.sh'?"; then
+
+    if query::polar "Remove extension '.sh'?"; then
       filename="${filename:0:-3}"
     else
       filename="${filename}"
     fi
   fi
-  
+
   if [[ -d $filename ]]; then
     chalk -l error "Specified path is a directory" >&2
     exit 1
   fi
-  
+
   if
     [[ -f $filename ]] && \
-    ! query_yes_no "Specified file already exists. Overwrite?"
+    ! query::polar "Specified file already exists. Overwrite?"
   then
     chalk -l warn "Omitting existing file '${filename}'"
     exit
@@ -169,12 +170,12 @@ function library_content() {
 function query_header() {
   query -o "Description" description
 
-  if query_yes_no -n "Add author information"; then
-    query -o "Author email" author_email
+  if query::polar -n "Add author information"; then
+    query::email -o "Author email" author_email
     query -d "${USER}" "Author name" author_name
   fi
 
-  if query_yes_no -n "Add copyright information"; then
+  if query::polar -n "Add copyright information"; then
     query -d "$(date +'%Y') ${author_name:-$USER}" \
       "Copyright information" \
       copyright
@@ -190,7 +191,7 @@ function main() {
   local target=$(readlink -f $filename)
 
   query_header
-  
+
   if [[ $EXECUTABLE == "true" ]]; then
     executable_content > $target
     chmod +x $target

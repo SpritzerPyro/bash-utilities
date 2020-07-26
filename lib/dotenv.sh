@@ -1,55 +1,48 @@
-#!/bin/bash
+function dotenv::grep() {
+  local flag OPTARG OPTIND
+  local flags=(--directories='skip' --extended-regexp --no-filename)
+  local var_regex="[a-zA-Z_]+[a-zA-Z0-9_]*"
 
-function dotenv_is_valid() {
-  local data=$(grep -Ev "^(\S+=|#|$)" $1 || true)
-
-  [[ -z $data ]]
-}
-
-function export_dotenv() {
-  if [[ ! -f $1 ]]; then
-    echo "export_dotenv: File '$1' does not exist" >&2
-    return 1
-  fi
-
-  if ! dotenv_is_valid $1; then
-    echo "export_dotenv: File '$1' is not a valid dotenv file" >&2
-    return 1
-  fi
-
-  set -a
-  source $1
-  set +a
-}
-
-function export_dotenvs() {
-  for i in $@; do
-    [[ ! -f $i ]] && continue
-    export_dotenv $i
+  while getopts 'isv:' flag; do
+    case "${flag}" in
+      i) flags+=(--ignore-case) ;;
+      s) flags+=(--no-messages) ;;
+      v) var_regex="${OPTARG}" ;;
+    esac
   done
-}
 
-function export_to_env() {
-  grep -E "^export\s\S+=" $1 | sed 's/export\s//'
-}
+  shift $(( ${OPTIND} - 1 ))
 
-function source_dotenv() {
-  if [[ ! -f $1 ]]; then
-    echo "source_dotenv: File '$1' does not exist" >&2
+  if [[ -z "$@" ]] && [[ "${flags[@]}" =~ "--no-messages" ]]; then
+    echo "dotenv::grep: No files specified" >&2
+
     return 1
   fi
 
-  if ! dotenv_is_valid $1; then
-    echo "source_dotenv: File '$1' is not a valid dotenv file" >&2
-    return 1
-  fi
+  local regex="^\s*(export\s+)?${var_regex}="
+  local res=$(grep "${flags[@]}" "${regex}" ${@:-""} || echo "")
 
-  source $1
+  echo "${res}" | sed -E 's/^\s*(export\s+)?//'
 }
 
-function source_dotenvs() {
-  for i in $@; do
-    [[ ! -f $i ]] && continue
-    source_dotenv $i
+function dotenv::source() {
+  local flag OPTARG OPTIND
+  local allexport=0
+  local grep_flags=()
+
+  while getopts 'aisv:' flag; do
+    case "${flag}" in
+      a) allexport=1 ;;
+      i|s) grep_flags+=("-${flag}") ;;
+      v) grep_flags+=("-v${OPTARG}") ;;
+    esac
   done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  if (( ${allexport} )); then set -a; fi
+
+  source <(dotenv::grep "${grep_flags[@]}" "$@")
+
+  if (( ${allexport} )); then set +a; fi
 }
