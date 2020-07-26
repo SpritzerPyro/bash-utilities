@@ -1,6 +1,6 @@
 function log() {
   local flag OPTARG OPTIND
-  local level=info
+  local level="info"
 
   while getopts 'l:' flag; do
     case "${flag}" in
@@ -24,7 +24,7 @@ function log() {
 }
 
 function log::exit_trap() {
-  [[ $1 == "0" ]] && return 0
+  [[ "$1" == "0" ]] && return 0
 
   IFS=' ' read -ra caller_array <<< "$(caller)"
   caller_path=$(readlink -f "${caller_array[1]}")
@@ -49,31 +49,31 @@ function log::set() {
 }
 
 function log::write() {
-  [[ -z "${BUTILS_LOG_PATH}" ]] && return
+  [[ -z "${BUTILS_LOG_PATH}" ]] && return 0
 
-  local -A level
+  local -A info
   local flag OPTARG OPTIND
-  local arg="info" prefix=""
+  local level="info" prefix=""
 
   while getopts 'l:' flag; do
     case "${flag}" in
       l)
-        [[ "${OPTARG}" == "off" ]] && return
+        [[ "${OPTARG}" == "off" ]] && return 0
 
-        arg="${OPTARG}"
+        level="${OPTARG}"
         ;;
     esac
   done
 
   shift $(( ${OPTIND} - 1 ))
 
-  config::log_info level "${arg}"
+  config::log_info info "${level}"
 
   if [[ ! -z "${BUTILS_LOG_TIME_FORMAT}" ]]; then
     prefix="[$(date +"${BUTILS_LOG_TIME_FORMAT}")] "
   fi
 
-  prefix="${prefix}$(printf '%-5s' "${level[key]}") : "
+  prefix="${prefix}$(printf '%-5s' "${info[key]}") : "
   prefix="${BUTILS_COLOR_PREFIX}${prefix}${BUTILS_COLOR_DEFAULT}"
 
   if [[ -f "${BUTILS_LOG_PATH}" ]]; then
@@ -96,14 +96,14 @@ function log::write() {
   fi
 
   if (( $# > 0 )); then
-    echo -e "${prefix}$(chalk -l "${level[level]}" "$@")" \
+    echo -e "${prefix}$(chalk -l "${info[level]}" "$@")" \
       | tee -a "${BUTILS_LOG_PATH}" >/dev/null
 
     return
   fi
 
   while read data; do
-    echo -e "${prefix}$(chalk -l "${level[level]}" "${data}")" \
+    echo -e "${prefix}$(chalk -l "${info[level]}" "${data}")" \
       | tee -a "${BUTILS_LOG_PATH}" >/dev/null
   done
 }

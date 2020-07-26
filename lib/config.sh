@@ -58,12 +58,12 @@ function config::log_info() {
 
 function config::source {
   local -r cfg_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../config)
-  local var
+  local variable
 
-  for var in $(cat "${cfg_dir}/variables"); do
-    [[ -n "${!var+set}" ]] && continue
+  for variable in $(cat "${cfg_dir}/variables"); do
+    [[ -n "${!variable+set}" ]] && continue
 
-    source <(grep -s "^${var}=" "${cfg_dir}/default.env")
+    source <(grep -s "^${variable}=" "${cfg_dir}/default.env")
   done
 }
 
