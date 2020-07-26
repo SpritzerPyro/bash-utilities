@@ -92,13 +92,12 @@ function log::write() {
   done
 }
 
-function log_native() {
-  [[ ! -z $@ ]] && local info="'$@'"
-  local info=${info:-command}
+function log::native() {
+  local -r info="${@:-"command"}"
 
-  log::write "Run $info"
-  tee -a $BASH_UTILS_LOG_PATH
-  log::write "Finished $info"
+  log::write "[Run] ${info}"
+  tee -a "${BASH_UTILS_LOG_PATH}"
+  log::write "[Done] ${info}"
 }
 
 function log::set() {
