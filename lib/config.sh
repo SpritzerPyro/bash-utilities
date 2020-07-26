@@ -38,6 +38,7 @@ function config::init_log() {
 
 function config::log_info() {
   local _level=info
+  local i
 
   for i in ${!BUTILS_LOG_LEVELS[@]}; do
     [[ "$2" != "${i}" ]] && continue
