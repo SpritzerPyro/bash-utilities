@@ -23,6 +23,20 @@ function log() {
   done
 }
 
+function log::add() {
+  local i
+
+  for i in "$@"; do
+    log::is_set "${i}" && continue
+
+    _butils_log_paths+=("$(readlink -m "${i}")")
+  done
+
+  exec 2> >(while read line; do echo "${line}" | log -l error; done)
+
+  trap 'log::exit_trap $?' EXIT
+}
+
 function log::exit_trap() {
   [[ "$1" == "0" ]] && return 0
 
@@ -32,31 +46,51 @@ function log::exit_trap() {
   echo "${caller_path} exited with code $1" | log -l error
 }
 
+function log::is_set() {
+  local data=$(readlink -m "$1")
+  local i
+
+  for i in "${_butils_log_paths[@]}"; do
+    local path=$(readlink -m "${i}")
+
+    [[ "${data}" == "${path}" ]] && return 0
+  done
+
+  return 1
+}
+
 function log::native() {
   local -r info="${@:-"command"}"
 
   log::write "[Run] ${info}"
-  tee -a "${BUTILS_LOG_PATH}"
+  tee -a "${_butils_log_paths[@]}"
   log::write "[Done] ${info}"
 }
 
 function log::set() {
-  BUTILS_LOG_PATH="$@"
+  declare -g _butils_log_paths=()
 
-  exec 2> >(while read line; do echo "${line}" | log -l error; done)
-
-  trap 'log::exit_trap $?' EXIT
+  log::add "$@"
 }
 
 function log::write() {
-  [[ -z "${BUTILS_LOG_PATH}" ]] && return 0
+  local path
 
-  local -A info
+  for path in "${_butils_log_paths[@]}"; do
+    log::write_file -f "${path}" "$@"
+  done
+}
+
+function log::write_file() {
   local flag OPTARG OPTIND
-  local level="info" prefix=""
+  local -A info
+  local file
+  local level="info"
+  local prefix=""
 
-  while getopts 'l:' flag; do
+  while getopts 'f:l:' flag; do
     case "${flag}" in
+      f) file="${OPTARG}" ;;
       l)
         [[ "${OPTARG}" == "off" ]] && return 0
 
@@ -64,6 +98,11 @@ function log::write() {
         ;;
     esac
   done
+
+  if [[ ! "${file}" ]]; then
+    echo "log::write_file: No file specified" >&2
+    return 1
+  fi
 
   shift $(( ${OPTIND} - 1 ))
 
@@ -76,39 +115,40 @@ function log::write() {
   prefix="${prefix}$(printf '%-5s' "${info[key]}") : "
   prefix="${BUTILS_COLOR_PREFIX}${prefix}${BUTILS_COLOR_DEFAULT}"
 
-  if [[ -f "${BUTILS_LOG_PATH}" ]]; then
-    local size=$(stat -c %s "${BUTILS_LOG_PATH}")
+  if [[ -f "${file}" ]]; then
+    local size=$(stat -c %s "${file}")
 
     if (( ${size} > ${BUTILS_LOG_MAX_SIZE} )); then
       local i=1
 
-      while [[ -f "${BUTILS_LOG_PATH}.${i}" ]]; do
+      while [[ -f "${file}.${i}" ]]; do
         (( i = i + 1 ));
       done
 
-      mv "${BUTILS_LOG_PATH}" "${BUTILS_LOG_PATH}.${i}"
+      mv "${file}" "${file}.${i}"
     fi
   fi
 
-  if [[ ! -f "${BUTILS_LOG_PATH}" ]]; then
-    mkdir -p $(dirname "${BUTILS_LOG_PATH}")
-    touch "${BUTILS_LOG_PATH}"
+  if [[ ! -f "${file}" ]]; then
+    mkdir -p $(dirname "${file}")
+    touch "${file}"
   fi
 
   if (( $# > 0 )); then
     echo -e "${prefix}$(chalk -l "${info[level]}" "$@")" \
-      | tee -a "${BUTILS_LOG_PATH}" >/dev/null
+      | tee -a "${file}" >/dev/null
 
     return
   fi
 
   while read data; do
     echo -e "${prefix}$(chalk -l "${info[level]}" "${data}")" \
-      | tee -a "${BUTILS_LOG_PATH}" >/dev/null
+      | tee -a "${file}" >/dev/null
   done
 }
 
 function log::init() {
+  declare -g _butils_log_paths=()
   local color
 
   for color in ${!BUTILS_LOG_COLORS[@]}; do

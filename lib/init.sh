@@ -27,7 +27,6 @@ function butils::use() {
       source "${lib_dir}/chalk.sh"
       source "${lib_dir}/log.sh"
       log::init
-      log::set "${BUTILS_LOG_PATH}"
       ;;
     query|queries)
       source "${lib_dir}/checks.sh"
