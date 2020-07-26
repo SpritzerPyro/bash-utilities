@@ -106,3 +106,13 @@ function log::set() {
 
   trap 'log::exit_trap $?' EXIT
 }
+
+function log::init() {
+  local color
+
+  for color in ${!BASH_UTILS_LOG_COLORS[@]}; do
+    eval "function log::${color}() {
+      log -l ${color} \"\$@\"
+    }"
+  done
+}
