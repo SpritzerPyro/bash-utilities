@@ -19,7 +19,7 @@ function config::init_dirs() {
 
 function config::init_log() {
   local i
-  declare -A -g BUTILS_LOG_COLORS
+  declare -A -g BUTILS_COLORS
   declare -A -g BUTILS_LOG_LEVELS=(
     [debug]=DEBUG
     [emph]=INFO
@@ -32,7 +32,7 @@ function config::init_log() {
   for i in ${!BUTILS_LOG_LEVELS[@]} default prefix; do
     local varname="BUTILS_COLOR_${i^^}"
 
-    BUTILS_LOG_COLORS["${i}"]="${!varname:-"${BUTILS_COLOR_DEFAULT}"}"
+    BUTILS_COLORS["${i}"]="${!varname:-"${BUTILS_COLOR_DEFAULT}"}"
   done
 }
 
@@ -45,7 +45,7 @@ function config::log_info() {
     _level="${i}"
   done
 
-  local _color="${BUTILS_LOG_COLORS["${_level}"]}"
+  local _color="${BUTILS_COLORS["${_level}"]}"
   local _key="${BUTILS_LOG_LEVELS["${_level}"]}"
 
   eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
