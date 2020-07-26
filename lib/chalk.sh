@@ -1,6 +1,8 @@
 function chalk() {
+  local flag OPTARG OPTIND
   local -A info
-  local flags=(-e) level="info" OPTARG OPTIND
+  local flags=(-e)
+  local level="info"
 
   while getopts 'l:n' flag; do
     case "${flag}" in

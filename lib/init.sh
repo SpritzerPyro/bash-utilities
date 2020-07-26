@@ -10,11 +10,20 @@ function butils::import() {
       source "${lib_dir}/chalk.sh"
       chalk::init
       ;;
-    config)
+    check|checks)
+      source "${lib_dir}/check.sh"
+      ;;
+    config|configs)
       source "${lib_dir}/config.sh"
       config::init
       ;;
-    log)
+    docker|docker-compose|compose)
+      source "${lib_dir}/docker.sh"
+      ;;
+    dotenv)
+      source "${lib_dir}/dotenv.sh"
+      ;;
+    log|logs|logging)
       source "${lib_dir}/chalk.sh"
       source "${lib_dir}/log.sh"
       log::init
@@ -26,7 +35,7 @@ function butils::import() {
       ;;
     *)
       if [[ ! -f "${lib_dir}/$1.sh" ]]; then
-        echo "lib::load: Library $1 does not exist" >&2
+        echo "butils::import: Library $1 does not exist" >&2
         return 1
       fi
 
