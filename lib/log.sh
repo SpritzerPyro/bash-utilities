@@ -113,7 +113,7 @@ function log::write_file() {
   fi
 
   prefix="${prefix}$(printf '%-5s' "${info[key]}") : "
-  prefix="${BUTILS_COLOR_PREFIX}${prefix}${BUTILS_COLOR_DEFAULT}"
+  prefix="${BUTILS_COLORS[prefix]}${prefix}${BUTILS_COLORS[default]}"
 
   if [[ -f "${file}" ]]; then
     local size=$(stat -c %s "${file}")

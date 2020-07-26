@@ -16,13 +16,13 @@ function chalk() {
   config::log_info info "${level}"
 
   if (( "$#" > 0 )); then
-    echo "${flags[@]}" "${info[color]}$@${BUTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}$@${BUTILS_COLORS[default]}"
 
     return
   fi
 
   while read data; do
-    echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLORS[default]}"
   done
 }
 
