@@ -37,19 +37,21 @@ function log::write() {
 
   local -A level
   local flag OPTARG OPTIND
-  local prefix=""
+  local arg="info" prefix=""
 
   while getopts 'l:' flag; do
     case "${flag}" in
       l)
         [[ "${OPTARG}" == "off" ]] && return
 
-        config::get_log_level level "${OPTARG}"
+        arg="${OPTARG}"
         ;;
     esac
   done
 
   shift $(( ${OPTIND} - 1 ))
+
+  config::get_log_level level "${arg}"
 
   if [[ ! -z "${BASH_UTILS_LOG_TIME_FORMAT}" ]]; then
     prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "

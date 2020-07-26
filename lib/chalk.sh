@@ -1,15 +1,18 @@
 function chalk() {
   local -A level
+  local arg="info"
   local OPTARG OPTIND flags=(-e)
 
   while getopts 'l:n' flag; do
     case "${flag}" in
-      l) config::get_log_level level "${OPTARG}" ;;
+      l) arg="${OPTARG}" ;;
       n) flags+=("-${flag}") ;;
     esac
   done
 
   shift $(($OPTIND - 1))
+
+  config::get_log_level level "${arg}"
 
   if (( "$#" > 0 )); then
     echo "${flags[@]}" "${level[color]}$@${BASH_UTILS_COLOR_DEFAULT}"
