@@ -32,6 +32,22 @@ function log::exit_trap() {
   echo "${caller_path} exited with code $1" | log -l error
 }
 
+function log::native() {
+  local -r info="${@:-"command"}"
+
+  log::write "[Run] ${info}"
+  tee -a "${BASH_UTILS_LOG_PATH}"
+  log::write "[Done] ${info}"
+}
+
+function log::set() {
+  BASH_UTILS_LOG_PATH="$@"
+
+  exec 2> >(while read line; do echo "${line}" | log -l error; done)
+
+  trap 'log::exit_trap $?' EXIT
+}
+
 function log::write() {
   [[ -z "${BASH_UTILS_LOG_PATH}" ]] && return
 
@@ -90,22 +106,6 @@ function log::write() {
     echo -e "${prefix}$(chalk -l "${level[level]}" "${data}")" \
       | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
   done
-}
-
-function log::native() {
-  local -r info="${@:-"command"}"
-
-  log::write "[Run] ${info}"
-  tee -a "${BASH_UTILS_LOG_PATH}"
-  log::write "[Done] ${info}"
-}
-
-function log::set() {
-  BASH_UTILS_LOG_PATH="$@"
-
-  exec 2> >(while read line; do echo "${line}" | log -l error; done)
-
-  trap 'log::exit_trap $?' EXIT
 }
 
 function log::init() {
