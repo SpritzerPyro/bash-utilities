@@ -19,8 +19,8 @@ function config::init_dirs() {
 
 function config::init_log() {
   local i
-  declare -A -g BASH_UTILS_LOG_COLORS
-  declare -A -g BASH_UTILS_LOG_LEVELS=(
+  declare -A -g BUTILS_LOG_COLORS
+  declare -A -g BUTILS_LOG_LEVELS=(
     [debug]=DEBUG
     [emph]=INFO
     [error]=ERROR
@@ -29,28 +29,28 @@ function config::init_log() {
     [warn]=WARN
   )
 
-  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
-    local varname="BASH_UTILS_COLOR_${i^^}"
-    BASH_UTILS_LOG_COLORS["${i}"]="${!varname:-"${BASH_UTILS_COLOR_DEFAULT}"}"
+  for i in ${!BUTILS_LOG_LEVELS[@]}; do
+    local varname="BUTILS_COLOR_${i^^}"
+    BUTILS_LOG_COLORS["${i}"]="${!varname:-"${BUTILS_COLOR_DEFAULT}"}"
   done
 }
 
 function config::log_info() {
   local _level=info
-  local _color="${BASH_UTILS_LOG_COLORS["${_level}"]}"
-  local _key="${BASH_UTILS_LOG_LEVELS["${_level}"]}"
+  local _color="${BUTILS_LOG_COLORS["${_level}"]}"
+  local _key="${BUTILS_LOG_LEVELS["${_level}"]}"
 
-  for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
+  for i in ${!BUTILS_LOG_LEVELS[@]}; do
     [[ "$2" != "${i}" ]] && continue
 
     _level="${i}"
-    _key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
+    _key="${BUTILS_LOG_LEVELS["${i}"]}"
   done
 
-  for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
+  for i in ${!BUTILS_LOG_COLORS[@]}; do
     [[ "$2" != "${i}" ]] && continue
 
-    _color="${BASH_UTILS_LOG_COLORS["${i}"]}"
+    _color="${BUTILS_LOG_COLORS["${i}"]}"
   done
 
   eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"

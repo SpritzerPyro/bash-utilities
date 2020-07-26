@@ -36,12 +36,12 @@ function log::native() {
   local -r info="${@:-"command"}"
 
   log::write "[Run] ${info}"
-  tee -a "${BASH_UTILS_LOG_PATH}"
+  tee -a "${BUTILS_LOG_PATH}"
   log::write "[Done] ${info}"
 }
 
 function log::set() {
-  BASH_UTILS_LOG_PATH="$@"
+  BUTILS_LOG_PATH="$@"
 
   exec 2> >(while read line; do echo "${line}" | log -l error; done)
 
@@ -49,7 +49,7 @@ function log::set() {
 }
 
 function log::write() {
-  [[ -z "${BASH_UTILS_LOG_PATH}" ]] && return
+  [[ -z "${BUTILS_LOG_PATH}" ]] && return
 
   local -A level
   local flag OPTARG OPTIND
@@ -69,49 +69,49 @@ function log::write() {
 
   config::log_info level "${arg}"
 
-  if [[ ! -z "${BASH_UTILS_LOG_TIME_FORMAT}" ]]; then
-    prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
+  if [[ ! -z "${BUTILS_LOG_TIME_FORMAT}" ]]; then
+    prefix="[$(date +"${BUTILS_LOG_TIME_FORMAT}")] "
   fi
 
   prefix="${prefix}$(printf '%-5s' "${level[key]}") : "
-  prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
+  prefix="${BUTILS_COLOR_PREFIX}${prefix}${BUTILS_COLOR_DEFAULT}"
 
-  if [[ -f "${BASH_UTILS_LOG_PATH}" ]]; then
-    local size=$(stat -c %s "${BASH_UTILS_LOG_PATH}")
+  if [[ -f "${BUTILS_LOG_PATH}" ]]; then
+    local size=$(stat -c %s "${BUTILS_LOG_PATH}")
 
-    if (( ${size} > ${BASH_UTILS_LOG_MAX_SIZE} )); then
+    if (( ${size} > ${BUTILS_LOG_MAX_SIZE} )); then
       local i=1
 
-      while [[ -f "${BASH_UTILS_LOG_PATH}.${i}" ]]; do
+      while [[ -f "${BUTILS_LOG_PATH}.${i}" ]]; do
         (( i = i + 1 ));
       done
 
-      mv "${BASH_UTILS_LOG_PATH}" "${BASH_UTILS_LOG_PATH}.${i}"
+      mv "${BUTILS_LOG_PATH}" "${BUTILS_LOG_PATH}.${i}"
     fi
   fi
 
-  if [[ ! -f "${BASH_UTILS_LOG_PATH}" ]]; then
-    mkdir -p $(dirname "${BASH_UTILS_LOG_PATH}")
-    touch "${BASH_UTILS_LOG_PATH}"
+  if [[ ! -f "${BUTILS_LOG_PATH}" ]]; then
+    mkdir -p $(dirname "${BUTILS_LOG_PATH}")
+    touch "${BUTILS_LOG_PATH}"
   fi
 
   if (( $# > 0 )); then
     echo -e "${prefix}$(chalk -l "${level[level]}" "$@")" \
-      | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
+      | tee -a "${BUTILS_LOG_PATH}" >/dev/null
 
     return
   fi
 
   while read data; do
     echo -e "${prefix}$(chalk -l "${level[level]}" "${data}")" \
-      | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
+      | tee -a "${BUTILS_LOG_PATH}" >/dev/null
   done
 }
 
 function log::init() {
   local color
 
-  for color in ${!BASH_UTILS_LOG_COLORS[@]}; do
+  for color in ${!BUTILS_LOG_COLORS[@]}; do
     eval "function log::${color}() {
       log -l ${color} \"\$@\"
     }"

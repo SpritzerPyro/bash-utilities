@@ -18,7 +18,7 @@ function butils::import() {
       source "${lib_dir}/chalk.sh"
       source "${lib_dir}/log.sh"
       log::init
-      log::set "${BASH_UTILS_LOG_PATH}"
+      log::set "${BUTILS_LOG_PATH}"
       ;;
     query|queries)
       source "${lib_dir}/checks.sh"

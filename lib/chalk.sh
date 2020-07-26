@@ -14,20 +14,20 @@ function chalk() {
   config::log_info info "${level}"
 
   if (( "$#" > 0 )); then
-    echo "${flags[@]}" "${info[color]}$@${BASH_UTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}$@${BUTILS_COLOR_DEFAULT}"
 
     return
   fi
 
   while read data; do
-    echo "${flags[@]}" "${info[color]}${data}${BASH_UTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLOR_DEFAULT}"
   done
 }
 
 function chalk::init() {
   local color
 
-  for color in ${!BASH_UTILS_LOG_COLORS[@]}; do
+  for color in ${!BUTILS_LOG_COLORS[@]}; do
     eval "function chalk::${color}() {
       local flags=(-l ${color})
       local OPTIND
