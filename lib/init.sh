@@ -6,7 +6,7 @@ function butils::import() {
   local -r lib_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 
   case "$1" in
-    chalk)
+    chalk|chalks)
       source "${lib_dir}/chalk.sh"
       chalk::init
       ;;

@@ -1,26 +1,26 @@
 function chalk() {
-  local -A level
-  local arg="info"
-  local OPTARG OPTIND flags=(-e)
+  local -A info
+  local flags=(-e) level="info" OPTARG OPTIND
 
   while getopts 'l:n' flag; do
     case "${flag}" in
-      l) arg="${OPTARG}" ;;
+      l) level="${OPTARG}" ;;
       n) flags+=("-${flag}") ;;
     esac
   done
 
-  shift $(($OPTIND - 1))
+  shift $(( ${OPTIND} - 1 ))
 
-  config::log_info level "${arg}"
+  config::log_info info "${level}"
 
   if (( "$#" > 0 )); then
-    echo "${flags[@]}" "${level[color]}$@${BASH_UTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}$@${BASH_UTILS_COLOR_DEFAULT}"
+
     return
   fi
 
   while read data; do
-    echo "${flags[@]}" "${level[color]}${data}${BASH_UTILS_COLOR_DEFAULT}"
+    echo "${flags[@]}" "${info[color]}${data}${BASH_UTILS_COLOR_DEFAULT}"
   done
 }
 
@@ -38,7 +38,7 @@ function chalk::init() {
         esac
       done
 
-      shift \$(( \$OPTIND - 1 ))
+      shift \$(( \${OPTIND} - 1 ))
 
       chalk \"\${flags[@]}\" \"\$@\"
     }"
