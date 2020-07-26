@@ -1,22 +1,22 @@
 function config::get_log_level() {
-  local level=info
-  local color="${BASH_UTILS_LOG_COLORS["${level}"]}"
-  local key="${BASH_UTILS_LOG_LEVELS["${level}"]}"
+  local _level=info
+  local _color="${BASH_UTILS_LOG_COLORS["${_level}"]}"
+  local _key="${BASH_UTILS_LOG_LEVELS["${_level}"]}"
 
   for i in ${!BASH_UTILS_LOG_LEVELS[@]}; do
     [[ "$2" != "${i}" ]] && continue
 
-    level="${i}"
-    key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
+    _level="${i}"
+    _key="${BASH_UTILS_LOG_LEVELS["${i}"]}"
   done
 
   for i in ${!BASH_UTILS_LOG_COLORS[@]}; do
     [[ "$2" != "${i}" ]] && continue
 
-    color="${BASH_UTILS_LOG_COLORS["${i}"]}"
+    _color="${BASH_UTILS_LOG_COLORS["${i}"]}"
   done
 
-  eval "$1=([color]=\"${color}\" [level]=\"${level}\" [key]=\"${key}\")"
+  eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
 }
 
 function config::init_dirs() {
