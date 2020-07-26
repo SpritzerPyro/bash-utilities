@@ -149,11 +149,11 @@ function log::write_file() {
 
 function log::init() {
   declare -g _butils_log_paths=()
-  local color
+  local level
 
-  for color in ${!BUTILS_LOG_COLORS[@]}; do
-    eval "function log::${color}() {
-      log -l ${color} \"\$@\"
+  for level in ${!BUTILS_LOG_LEVELS[@]}; do
+    eval "function log::${level}() {
+      log -l ${level} \"\$@\"
     }"
   done
 }

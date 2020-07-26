@@ -29,29 +29,24 @@ function config::init_log() {
     [warn]=WARN
   )
 
-  for i in ${!BUTILS_LOG_LEVELS[@]}; do
+  for i in ${!BUTILS_LOG_LEVELS[@]} default prefix; do
     local varname="BUTILS_COLOR_${i^^}"
+
     BUTILS_LOG_COLORS["${i}"]="${!varname:-"${BUTILS_COLOR_DEFAULT}"}"
   done
 }
 
 function config::log_info() {
   local _level=info
-  local _color="${BUTILS_LOG_COLORS["${_level}"]}"
-  local _key="${BUTILS_LOG_LEVELS["${_level}"]}"
 
   for i in ${!BUTILS_LOG_LEVELS[@]}; do
     [[ "$2" != "${i}" ]] && continue
 
     _level="${i}"
-    _key="${BUTILS_LOG_LEVELS["${i}"]}"
   done
 
-  for i in ${!BUTILS_LOG_COLORS[@]}; do
-    [[ "$2" != "${i}" ]] && continue
-
-    _color="${BUTILS_LOG_COLORS["${i}"]}"
-  done
+  local _color="${BUTILS_LOG_COLORS["${_level}"]}"
+  local _key="${BUTILS_LOG_LEVELS["${_level}"]}"
 
   eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
 }

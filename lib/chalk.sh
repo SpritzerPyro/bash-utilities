@@ -27,11 +27,11 @@ function chalk() {
 }
 
 function chalk::init() {
-  local color
+  local level
 
-  for color in ${!BUTILS_LOG_COLORS[@]}; do
-    eval "function chalk::${color}() {
-      local flags=(-l ${color})
+  for level in ${!BUTILS_LOG_LEVELS[@]}; do
+    eval "function chalk::${level}() {
+      local flags=(-l ${level})
       local OPTIND
 
       while getopts 'n' flag; do
