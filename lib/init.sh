@@ -1,8 +1,8 @@
 function butils::init() {
-  butils::import config
+  butils::use config
 }
 
-function butils::import() {
+function butils::use() {
   local -r lib_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
 
   case "$1" in
@@ -35,7 +35,7 @@ function butils::import() {
       ;;
     *)
       if [[ ! -f "${lib_dir}/$1.sh" ]]; then
-        echo "butils::import: Library $1 does not exist" >&2
+        echo "butils::use: Library $1 does not exist" >&2
         return 1
       fi
 

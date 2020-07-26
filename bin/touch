@@ -35,8 +35,8 @@ readonly current_dir=$(dirname $(readlink -f $0))
 
 source $current_dir/../lib/init.sh
 
-butils::import chalk
-butils::import query
+butils::use chalk
+butils::use query
 
 author_email=
 author_name=
