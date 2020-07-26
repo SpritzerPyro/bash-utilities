@@ -1,26 +1,77 @@
 #!/bin/bash
 
-function docker_compose_service_id() {
-  local config_path=""
-  local service_name=${1:?"No service name provided"}
+function docker::pid() {
+  local flag OPTARG OPTIND
+  local -r flags=(--format '{{ .State.Pid }}')
+  local target
+  local write
 
-  [[ ! -z $2 ]] && local config_path="--file $2"
+  while getopts 's:t:w:' flag; do
+    case "${flag}" in
+      s|t) target="${OPTARG}" ;;
+      w) write="${OPTARG}" ;;
+    esac
+  done
 
-  docker-compose $config_path ps -q $service_name
+  shift $(( ${OPTIND} - 1 ))
+
+  target="${target:-"$1"}"
+
+  local -r pid=$(docker container inspect "${flags[@]}" "${target}")
+
+  if [[ "${write}" ]]; then
+    echo "${pid}" > "${write}"
+  fi
+
+  echo "${pid}"
 }
 
-function docker_compose_service_pid() {
-  local service_name=${1:?"No service name provided"}
-  local service_id=$(docker_compose_service_id $service_name $2)
+function docker_compose::id() {
+  local flag OPTARG OPTIND
+  local flags=()
+  local service
+  local write
 
-  docker inspect --format '{{ .State.Pid }}' $service_id
+  while getopts 'f:s:t:w:' flag; do
+    case "${flag}" in
+      f) flags+=(--file "${OPTARG}") ;;
+      s|t) service="${OPTARG}" ;;
+      w) write="${OPTARG}" ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  service="${service:-"$1"}"
+
+  local -r id=$(docker-compose "${flags[@]}" ps --quiet "${service}")
+
+  if [[ "${write}" ]]; then
+    echo "${id}" > "${write}"
+  fi
+
+  echo "${id}"
 }
 
-function docker_compose_export_pid {
-  local usage="Usage: docker_compose_export_pid service /export/path (/compose/yml/path)"
-  local service_name=${1:?$usage}
-  local export_path=${2:?$usage}
-  local service_pid=$(docker_compose_service_pid $1 $3)
+function docker_compose::pid {
+  local flag OPTARG OPTIND
+  local id_flags=()
+  local pid_flags=()
+  local service
 
-  echo $service_pid > $export_path
+  while getopts 'f:s:t:w:' flag; do
+    case "${flag}" in
+      f) id_flags+=(-f "${OPTARG}") ;;
+      s|t) service="${OPTARG}" ;;
+      w) pid_flags+=(-w "${OPTARG}") ;;
+    esac
+  done
+
+  shift $(( ${OPTIND} - 1 ))
+
+  service="${service:-"$1"}"
+
+  local -r id=$(docker_compose::id "${id_flags[@]}" "${service}")
+
+  docker::pid "${pid_flags[@]}" "${id}"
 }
