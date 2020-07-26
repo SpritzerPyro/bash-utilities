@@ -20,6 +20,10 @@ function butils::import() {
       log::init
       log::set "${BASH_UTILS_LOG_PATH}"
       ;;
+    query|queries)
+      source "${lib_dir}/checks.sh"
+      source "${lib_dir}/query.sh"
+      ;;
     *)
       if [[ ! -f "${lib_dir}/$1.sh" ]]; then
         echo "lib::load: Library $1 does not exist" >&2

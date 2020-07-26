@@ -1,5 +1,3 @@
-source "$(dirname "${BASH_SOURCE[0]}")/checks.sh"
-
 function query() {
   local OPTARG OPTIND
   local qry_answer qry_default qry_email qry_optional qry_path
