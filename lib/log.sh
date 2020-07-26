@@ -35,20 +35,16 @@ function log::exit_trap() {
 function log::write() {
   [[ -z "${BASH_UTILS_LOG_PATH}" ]] && return
 
-  local -A level=([color]=info [severity]=info)
+  local -A level
   local flag OPTARG OPTIND
   local prefix=""
 
   while getopts 'l:' flag; do
     case "${flag}" in
       l)
-        case "${OPTARG}" in
-          emph) level[color]=emph ;;
-          error) level=([color]=error [severity]=error) ;;
-          off) return ;;
-          success) level[color]=success ;;
-          warn | warning) level=([color]=warn [severity]=warn) ;;
-        esac
+        [[ "${OPTARG}" == "off" ]] && return
+
+        config::get_log_level level "${OPTARG}"
         ;;
     esac
   done
@@ -59,7 +55,7 @@ function log::write() {
     prefix="[$(date +"${BASH_UTILS_LOG_TIME_FORMAT}")] "
   fi
 
-  prefix="${prefix}$(printf '%-5s' "${level[severity]^^}") : "
+  prefix="${prefix}$(printf '%-5s' "${level[key]}") : "
   prefix="${BASH_UTILS_COLOR_PREFIX}${prefix}${BASH_UTILS_COLOR_DEFAULT}"
 
   if [[ -f "${BASH_UTILS_LOG_PATH}" ]]; then
@@ -82,14 +78,14 @@ function log::write() {
   fi
 
   if (( $# > 0 )); then
-    echo -e "${prefix}$(chalk -l "${level[color]}" "$@")" \
+    echo -e "${prefix}$(chalk -l "${level[level]}" "$@")" \
       | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
 
     return
   fi
 
   while read data; do
-    echo -e "${prefix}$(chalk -l "${level[color]}" "${data}")" \
+    echo -e "${prefix}$(chalk -l "${level[level]}" "${data}")" \
       | tee -a "${BASH_UTILS_LOG_PATH}" >/dev/null
   done
 }
