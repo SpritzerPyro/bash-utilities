@@ -2,17 +2,6 @@
 
 set -euo pipefail
 
-function usage() {
-  echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
-  echo ""
-  echo "Selecting a filetype like executable or library is mandatory!"
-  echo ""
-  echo "Options:"
-  echo "  -e, -x  Create executable script"
-  echo "  -h      Show this information"
-  echo "  -l      Create library file"
-}
-
 function create_header() {
   if [[ "${description}" ]]; then
     echo "# ${description}"
@@ -42,6 +31,51 @@ function create_header() {
   fi
 }
 
+function create_libname() {
+  local -r _filename=$(basename "$1")
+
+  if [[ "${_filename: -3}" == ".sh" ]]; then
+    echo "${_filename:0:-3}"
+  else
+    echo "${_filename}"
+  fi
+}
+
+function create_path() {
+  local -r _filename="$1"
+
+  if ! (( ${executable} )) && [[ "${_filename: -3}" != ".sh" ]]; then
+    _filename="${_filename}.sh"
+  fi
+
+  if (( ${executable} )) && [[ "${_filename: -3}" == ".sh" ]]; then
+    chalk -l warn "Executables should have no extension"
+
+    if query::polar "Remove extension '.sh'?"; then
+      _filename="${_filename:0:-3}"
+    else
+      _filename="${_filename}"
+    fi
+  fi
+
+  local -r _path=$(readlink -m "${_filename}")
+
+  if [[ -d "${_path}" ]]; then
+    chalk -l error "Specified path '${_path}' is a directory" >&2
+    exit 1
+  fi
+
+  if
+    [[ -f "${_path}" ]] && \
+    ! query::polar "Specified file already exists. Overwrite?"
+  then
+    chalk -l warn "Omitting existing file '${_path}'"
+    exit
+  fi
+
+  eval "$2=\"${_path}\""
+}
+
 function escape_string() {
   echo $(basename "$1") \
     | tr -cs '[:alnum:]\n\r' '_' \
@@ -51,7 +85,7 @@ function escape_string() {
 function executable_content() {
   local -r header=$(create_header)
   local -r libpath=$(
-    realpath --relative-to=$(dirname "${filename}") "${script_dir}/../lib"
+    realpath --relative-to=$(dirname "${target}") "${script_dir}/../lib"
   )
 
   echo "#!/bin/bash"
@@ -75,46 +109,9 @@ function executable_content() {
   echo 'main "$@"'
 }
 
-function handle_path() {
-  filename="$1"
-  local -r extension="${filename: -3}"
-
-  if ! (( ${executable} )) && [[ "${extension}" == ".sh" ]]; then
-    libname="${filename:0:-3}"
-    libname=$(escape_string "${filename:0:-3}")
-  fi
-
-  if ! (( ${executable} )) && [[ "${extension}" != ".sh" ]]; then
-    libname=$(escape_string "${filename}")
-    filename="${filename}.sh"
-  fi
-
-  if (( ${executable} )) && [[ "${extension}" == ".sh" ]]; then
-    chalk -l warn "Executables should have no extension"
-
-    if query::polar "Remove extension '.sh'?"; then
-      filename="${filename:0:-3}"
-    else
-      filename="${filename}"
-    fi
-  fi
-
-  if [[ -d "${filename}" ]]; then
-    chalk -l error "Specified path is a directory" >&2
-    exit 1
-  fi
-
-  if
-    [[ -f "${filename}" ]] && \
-    ! query::polar "Specified file already exists. Overwrite?"
-  then
-    chalk -l warn "Omitting existing file '${filename}'"
-    exit
-  fi
-}
-
 function library_content() {
   local -r header=$(create_header)
+  local -r libname=$(create_libname "${target}")
 
   if [[ "${header}" ]]; then
     echo "${header}"
@@ -143,6 +140,11 @@ function library_content() {
 }
 
 function query_header() {
+  declare -g author_email=""
+  declare -g author_name=""
+  declare -g copyright=""
+  declare -g description=""
+
   query -o -v description "Description"
 
   if query::polar -n "Add author information?"; then
@@ -158,14 +160,20 @@ function query_header() {
   fi
 }
 
+function usage() {
+  echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
+  echo ""
+  echo "Selecting a filetype like executable or library is mandatory!"
+  echo ""
+  echo "Options:"
+  echo "  -e, -x  Create executable script"
+  echo "  -h      Show this information"
+  echo "  -l      Create library file"
+}
+
 function main() {
-  declare -g author_email=""
-  declare -g author_name=""
-  declare -g copyright=""
-  declare -g description=""
   declare -g executable
-  declare -g filename=""
-  declare -g libname=""
+  declare -g target=""
 
   while getopts 'ehlx' flag; do
     case "${flag}" in
@@ -190,9 +198,7 @@ function main() {
   butils::use chalk
   butils::use query
 
-  handle_path "$1"
-
-  local -r target=$(readlink -m "${filename}")
+  create_path "$1" target
 
   mkdir -p $(dirname "${target}")
   rm -f "${target}"
