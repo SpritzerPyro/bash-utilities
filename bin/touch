@@ -42,7 +42,7 @@ function create_libname() {
 }
 
 function create_path() {
-  local -r _filename="$1"
+  local _filename="$1"
 
   if ! (( ${executable} )) && [[ "${_filename: -3}" != ".sh" ]]; then
     _filename="${_filename}.sh"
