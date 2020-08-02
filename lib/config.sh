@@ -53,7 +53,7 @@ function config::log_info() {
 }
 
 function config::source {
-  local -r cfg_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}")/../config)
+  local -r cfg_dir="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/../config"
   local variable
 
   for variable in $(cat "${cfg_dir}/variables"); do
