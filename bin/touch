@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eo pipefail
+set -euo pipefail
 
 function usage() {
   echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
@@ -8,115 +8,88 @@ function usage() {
   echo "Selecting a filetype like executable or library is mandatory!"
   echo ""
   echo "Options:"
-  echo -e "  -e, -x  Create executable script"
-  echo -e "  -h      Show this information"
-  echo -e "  -l      Create library file"
+  echo "  -e, -x  Create executable script"
+  echo "  -h      Show this information"
+  echo "  -l      Create library file"
 }
 
-EXECUTABLE=
-
-while getopts 'ehlx' flag; do
-  case "${flag}" in
-    e|x) EXECUTABLE=true ;;
-    h) usage && exit 0 ;;
-    l) EXECUTABLE=false ;;
-    *) usage && exit 1 ;;
-  esac
-done
-
-readonly EXECUTABLE
-
-shift $(($OPTIND - 1))
-
-[[ -z $1 ]] && usage && exit 1;
-[[ -z $EXECUTABLE ]] && usage && exit 1;
-
-readonly current_dir=$(dirname $(readlink -f $0))
-
-source $current_dir/../lib/init.sh
-
-butils::use chalk
-butils::use query
-
-author_email=
-author_name=
-copyright=
-description=
-filename=
-libname=
-
 function create_header() {
-  if [[ ! -z "${description}" ]]; then
+  if [[ "${description}" ]]; then
     echo "# ${description}"
   fi
 
   if
-    [[ ! -z "${description}" ]] && (
-      [[ ! -z "${author_email}" ]] || \
-      [[ ! -z "${author_name}" ]] || \
-      [[ ! -z "${copyright}" ]]
+    [[ "${description}" ]] && \
+    (
+      [[ "${author_email}" ]] || \
+      [[ "${author_name}" ]] || \
+      [[ "${copyright}" ]]
     )
   then
     echo "#"
   fi
 
-  if [[ ! -z "${copyright}" ]]; then
+  if [[ "${copyright}" ]]; then
     echo "# Copyright ${copyright}"
   fi
 
-  if [[ ! -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+  if [[ "${author_email}" ]] && [[ "${author_name}" ]]; then
     echo "# Author: ${author_email} (${author_name})"
   fi
 
-  if [[ -z "${author_email}" ]] && [[ ! -z "${author_name}" ]]; then
+  if [[ ! "${author_email}" ]] && [[ "${author_name}" ]]; then
     echo "# Author: ${author_name}"
   fi
 }
 
 function escape_string() {
-  echo "$(basename "$1")" \
+  echo $(basename "$1") \
     | tr -cs '[:alnum:]\n\r' '_' \
     | tr '[:upper:]' '[:lower:]'
 }
 
 function executable_content() {
-  local libpath=$(realpath --relative-to=$(dirname $filename) $current_dir/../lib)
+  local -r header=$(create_header)
+  local -r libpath=$(
+    realpath --relative-to=$(dirname "${filename}") "${script_dir}/../lib"
+  )
 
   echo "#!/bin/bash"
 
-  if [[ ! -z "$(create_header)" ]]; then
+  if [[ "${header}" ]]; then
     echo "#"
-    create_header
+    echo "${header}"
   fi
 
-  echo ""
-  echo "set -eo pipefail"
-  echo ""
-  echo "function main() {"
-  echo "  local -r current_dir=\$(readlink -f \$(dirname \"\${BASH_SOURCE[0]}\"))"
-  echo ""
-  echo "  source \"\${current_dir}/${libpath}/init.sh\""
-  echo ""
-  echo "  echo \"Hello world\""
-  echo "}"
-  echo ""
+  echo ''
+  echo 'set -euo pipefail'
+  echo ''
+  echo 'function main() {'
+  echo '  readonly script_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}"))'
+  echo ''
+  echo "  source \"\${script_dir}/${libpath}/init.sh\""
+  echo ''
+  echo '  echo "Hello world"'
+  echo '}'
+  echo ''
   echo 'main "$@"'
 }
 
 function handle_path() {
-  filename="${1}"
-  local extension="${filename: -3}"
+  filename="$1"
+  local -r extension="${filename: -3}"
 
-  if [[ $EXECUTABLE != "true" ]] && [[ $extension == '.sh' ]]; then
+  if ! (( ${executable} )) && [[ "${extension}" == ".sh" ]]; then
+    libname="${filename:0:-3}"
     libname=$(escape_string "${filename:0:-3}")
   fi
 
-  if [[ $EXECUTABLE != "true" ]] && [[ $extension != '.sh' ]]; then
+  if ! (( ${executable} )) && [[ "${extension}" != ".sh" ]]; then
     libname=$(escape_string "${filename}")
     filename="${filename}.sh"
   fi
 
-  if [[ $EXECUTABLE == "true" ]] && [[ $extension == ".sh" ]]; then
+  if (( ${executable} )) && [[ "${extension}" == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
 
     if query::polar "Remove extension '.sh'?"; then
@@ -126,13 +99,13 @@ function handle_path() {
     fi
   fi
 
-  if [[ -d $filename ]]; then
+  if [[ -d "${filename}" ]]; then
     chalk -l error "Specified path is a directory" >&2
     exit 1
   fi
 
   if
-    [[ -f $filename ]] && \
+    [[ -f "${filename}" ]] && \
     ! query::polar "Specified file already exists. Overwrite?"
   then
     chalk -l warn "Omitting existing file '${filename}'"
@@ -141,8 +114,10 @@ function handle_path() {
 }
 
 function library_content() {
-  if [[ ! -z "$(create_header)" ]]; then
-    create_header
+  local -r header=$(create_header)
+
+  if [[ "${header}" ]]; then
+    echo "${header}"
     echo ""
   fi
 
@@ -158,8 +133,8 @@ function library_content() {
   echo "#   (Output to STDOUT or STDERR.)"
   echo "#   Writes location to stdout"
   echo "# Returns:"
-  echo -n "#   (Returned values other than the default exit "
-  echo "status of the last command run.)"
+  echo "#   (Returned values other than the default exit" \
+    "status of the last command run.)"
   echo "#   0 if thing was deleted, non-zero on error."
   echo "#######################################"
   echo "function ${libname}::my_func() {"
@@ -168,37 +143,69 @@ function library_content() {
 }
 
 function query_header() {
-  query -o "Description" description
+  query -o -v description "Description"
 
-  if query::polar -n "Add author information"; then
-    query::email -o "Author email" author_email
-    query -d "${USER}" "Author name" author_name
+  if query::polar -n "Add author information?"; then
+    query::email -o -v author_email "Author email"
+    query -d "${USER}" -v author_name "Author name"
   fi
 
-  if query::polar -n "Add copyright information"; then
-    query -d "$(date +'%Y') ${author_name:-$USER}" \
-      "Copyright information" \
-      copyright
+  if query::polar -n "Add copyright information?"; then
+    query \
+      -d "$(date +'%Y') ${author_name:-$USER}" \
+      -v copyright \
+      "Copyright information"
   fi
 }
 
 function main() {
-  handle_path "${1}"
+  declare -g author_email=""
+  declare -g author_name=""
+  declare -g copyright=""
+  declare -g description=""
+  declare -g executable
+  declare -g filename=""
+  declare -g libname=""
 
-  mkdir -p "$(dirname "$1")"
-  rm -f "$1"
+  while getopts 'ehlx' flag; do
+    case "${flag}" in
+      e|x) executable=1 ;;
+      h) usage && exit 0 ;;
+      l) executable=0 ;;
+      *) usage && exit 1 ;;
+    esac
+  done
 
-  local target=$(readlink -f $filename)
+  shift $(( ${OPTIND} - 1 ))
+
+  if [[ ! "${1-}" ]] || [[ ! "${executable-}" ]]; then
+    usage >&2
+    exit 1
+  fi
+
+  readonly script_dir=$(readlink -f $(dirname "$0"))
+
+  source "${script_dir}/../lib/init.sh"
+
+  butils::use chalk
+  butils::use query
+
+  handle_path "$1"
+
+  local -r target=$(readlink -m "${filename}")
+
+  mkdir -p $(dirname "${target}")
+  rm -f "${target}"
 
   query_header
 
-  if [[ $EXECUTABLE == "true" ]]; then
-    executable_content > $target
-    chmod +x $target
+  if (( ${executable} )); then
+    executable_content > "${target}"
+    chmod +x "${target}"
     chalk -l success "Successfully created executable '${target}'"
   else
-    library_content > $target
-    chmod -x $target
+    library_content > "${target}"
+    chmod -x "${target}"
     chalk -l success "Successfully created library file '${target}'"
   fi
 }
