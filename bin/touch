@@ -99,7 +99,7 @@ function executable_content() {
   echo 'set -euo pipefail'
   echo ''
   echo 'function main() {'
-  echo '  readonly script_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}"))'
+  echo '  readonly script_dir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))'
   echo ''
   echo "  source \"\${script_dir}/${libpath}\""
   echo ''
@@ -191,7 +191,7 @@ function main() {
     exit 1
   fi
 
-  readonly script_dir=$(readlink -f $(dirname "$0"))
+  readonly script_dir=$(dirname $(readlink -f "$0"))
 
   source "${script_dir}/../butils.sh"
 
