@@ -1,7 +1,7 @@
 function query() {
   local flag OPTARG OPTIND
-  local _answer
-  local _default
+  local _answer=""
+  local _default=""
   local _email=0
   local _optional=0
   local _path=0
@@ -98,7 +98,9 @@ function query::path() {
 
 function query::polar() {
   local flag OPTARG OPTIND
-  local _answer _default _variable
+  local _answer=""
+  local _default=""
+  local _variable=""
 
   while getopts 'nv:y' flag; do
     case "${flag}" in
@@ -128,7 +130,7 @@ function query::polar() {
     case "${_answer}" in
       Y|y|yes)
         if [[ "${_variable}" ]]; then
-          eval "${_variable}='yes'"
+          eval "${_variable}=1"
         fi
 
         return 0
@@ -138,7 +140,7 @@ function query::polar() {
           return 1
         fi
 
-        eval "${_variable}='no'"
+        eval "${_variable}=0"
 
         return 0
         ;;
