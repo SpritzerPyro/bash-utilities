@@ -3,7 +3,7 @@ function butils::init() {
 }
 
 function butils::use() {
-  local -r lib_dir=$(readlink -f "$(dirname "${BASH_SOURCE[0]}")")
+  local -r lib_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}")/lib)
 
   case "$1" in
     chalk|chalks)

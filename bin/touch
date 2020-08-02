@@ -85,7 +85,7 @@ function escape_string() {
 function executable_content() {
   local -r header=$(create_header)
   local -r libpath=$(
-    realpath --relative-to=$(dirname "${target}") "${script_dir}/../lib"
+    realpath --relative-to=$(dirname "${target}") "${script_dir}/../butils.sh"
   )
 
   echo "#!/bin/bash"
@@ -101,7 +101,7 @@ function executable_content() {
   echo 'function main() {'
   echo '  readonly script_dir=$(readlink -f $(dirname "${BASH_SOURCE[0]}"))'
   echo ''
-  echo "  source \"\${script_dir}/${libpath}/init.sh\""
+  echo "  source \"\${script_dir}/${libpath}\""
   echo ''
   echo '  echo "Hello world"'
   echo '}'
@@ -193,7 +193,7 @@ function main() {
 
   readonly script_dir=$(readlink -f $(dirname "$0"))
 
-  source "${script_dir}/../lib/init.sh"
+  source "${script_dir}/../butils.sh"
 
   butils::use chalk
   butils::use query
