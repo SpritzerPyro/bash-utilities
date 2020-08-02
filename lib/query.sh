@@ -130,7 +130,7 @@ function query::polar() {
     case "${_answer}" in
       Y|y|yes)
         if [[ "${_variable}" ]]; then
-          eval "${_variable}='yes'"
+          eval "${_variable}=1"
         fi
 
         return 0
@@ -140,7 +140,7 @@ function query::polar() {
           return 1
         fi
 
-        eval "${_variable}='no'"
+        eval "${_variable}=0"
 
         return 0
         ;;

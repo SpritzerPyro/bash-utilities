@@ -289,11 +289,11 @@ Synonym for `query -p`.
 
 #### query::polar
 
-| flag | usage | description                                   |
-| ---- | ----- | --------------------------------------------- |
-| n    | `-n`  | Sets the default answer to 'no' or 1          |
-| v    | `-v`  | Specifies a variable the answer is written to |
-| y    | `-y`  | Sets the default answer to 'yes' or 0         |
+| flag | usage | description                                           |
+| ---- | ----- | ----------------------------------------------------- |
+| n    | `-n`  | Sets the default answer to number 0 or return value 1 |
+| v    | `-v`  | Specifies a variable the answer is written to         |
+| y    | `-y`  | Sets the default answer to number 1 or return value 0 |
 
 The `query::polar` function prompts the user for a yes or no (polar) question. The answer directly can be used as a boolean condition or stored into a variable.
 
@@ -306,7 +306,11 @@ fi
 
 query_::polar -y -v data "Fill 'foo' variable"
 
-echo "Answer: ${data}"
+if (( ${data} )); then
+  echo "Answer was 'yes'"
+else
+  echo "Answer was 'no'"
+fi
 ```
 
 ### log.sh
