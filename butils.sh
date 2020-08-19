@@ -11,7 +11,7 @@ function butils::use() {
       chalk::init
       ;;
     check|checks)
-      source "${lib_dir}/check.sh"
+      source "${lib_dir}/checks.sh"
       ;;
     config|configs)
       source "${lib_dir}/config.sh"
