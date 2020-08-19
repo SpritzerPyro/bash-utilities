@@ -28,7 +28,7 @@ function butils::use() {
       ;;
     config|configs)
       source "${lib_dir}/config.sh"
-      config::init
+      _config::init
       ;;
     docker|docker-compose|compose)
       source "${lib_dir}/docker.sh"

@@ -106,7 +106,7 @@ function log::write_file() {
 
   shift $(( ${OPTIND} - 1 ))
 
-  config::log_info info "${level}"
+  _config::log_info info "${level}"
 
   if [[ ! -z "${BUTILS_LOG_TIME_FORMAT}" ]]; then
     prefix="[$(date +"${BUTILS_LOG_TIME_FORMAT}")] "

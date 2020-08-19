@@ -13,7 +13,7 @@ function chalk() {
 
   shift $(( ${OPTIND} - 1 ))
 
-  config::log_info info "${level}"
+  _config::log_info info "${level}"
 
   if (( "$#" > 0 )); then
     echo "${flags[@]}" "${info[color]}$@${BUTILS_COLORS[default]}"
