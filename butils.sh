@@ -1,5 +1,18 @@
 function butils::init() {
+  local flag OPTARG OPTIND
+
   butils::use config
+
+  while getopts 'au:' flag; do
+    case "${flag}" in
+      a)
+        for i in chalk checks docker dotenv log query; do
+          butils::use "${i}"
+        done
+        ;;
+      u) butils::use "${OPTARG}" ;;
+    esac
+  done
 }
 
 function butils::use() {
@@ -43,4 +56,4 @@ function butils::use() {
   esac
 }
 
-butils::init
+butils::init "$@"
