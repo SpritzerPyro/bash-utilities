@@ -1,10 +1,10 @@
-function config::arg_state() {
+function _config::arg_state() {
   local -r option=$(set -o | grep "$1" || echo "")
 
   echo "${option}" | sed -r 's/.*\s+//'
 }
 
-function config::init_dirs() {
+function _config::init_dirs() {
   export USER="${USER:-"${LOGNAME}"}"
 
   declare -A -g DIRS
@@ -23,7 +23,7 @@ function config::init_dirs() {
   fi
 }
 
-function config::init_log() {
+function _config::init_log() {
   local i
   declare -A -g BUTILS_COLORS
   declare -A -g BUTILS_LOG_LEVELS=(
@@ -42,7 +42,7 @@ function config::init_log() {
   done
 }
 
-function config::log_info() {
+function _config::log_info() {
   local _level=info
   local i
 
@@ -58,7 +58,7 @@ function config::log_info() {
   eval "$1=([color]=\"${_color}\" [level]=\"${_level}\" [key]=\"${_key}\")"
 }
 
-function config::source {
+function _config::source {
   local -r cfg_dir="$(dirname $(readlink -f "${BASH_SOURCE[0]}"))/../config"
   local variable
 
@@ -69,8 +69,8 @@ function config::source {
   done
 }
 
-function config::init {
-  config::source
-  config::init_dirs
-  config::init_log
+function _config::init {
+  _config::source
+  _config::init_dirs
+  _config::init_log
 }
