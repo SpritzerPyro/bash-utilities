@@ -26,6 +26,7 @@ function dotenv::grep() {
 }
 
 function dotenv::source() {
+  local -r allexport_state=$(config::arg_state allexport)
   local flag OPTARG OPTIND
   local allexport=0
   local grep_flags=()
@@ -40,9 +41,13 @@ function dotenv::source() {
 
   shift $(( ${OPTIND} - 1 ))
 
-  if (( ${allexport} )); then set -a; fi
+  if (( ${allexport} )); then
+    set -a;
+  fi
 
-  source <(dotenv::grep "${grep_flags[@]}" "$@")
+  source <(dotenv::grep "${grep_flags[@]+"${grep_flags[@]}"}" "$@")
 
-  if (( ${allexport} )); then set +a; fi
+  if [[ "${allexport_state}" == "off" ]]; then
+    set +a;
+  fi
 }
