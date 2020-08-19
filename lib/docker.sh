@@ -44,7 +44,9 @@ function docker_compose::id() {
 
   service="${service:-"$1"}"
 
-  local -r id=$(docker-compose "${flags[@]}" ps --quiet "${service}")
+  local -r id=$(
+    docker-compose "${flags[@]+"${flags[@]}"}" ps --quiet "${service}"
+  )
 
   if [[ "${write}" ]]; then
     echo "${id}" > "${write}"
@@ -71,7 +73,9 @@ function docker_compose::pid {
 
   service="${service:-"$1"}"
 
-  local -r id=$(docker_compose::id "${id_flags[@]}" "${service}")
+  local -r id=$(
+    docker_compose::id "${id_flags[@]+"${id_flags[@]}"}" "${service}"
+  )
 
-  docker::pid "${pid_flags[@]}" "${id}"
+  docker::pid "${pid_flags[@]+"${pid_flags[@]}"}" "${id}"
 }

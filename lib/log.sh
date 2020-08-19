@@ -50,7 +50,7 @@ function log::is_set() {
   local data=$(readlink -m "$1")
   local i
 
-  for i in "${_butils_log_paths[@]}"; do
+  for i in ${_butils_log_paths[@]+"${_butils_log_paths[@]}"}; do
     local path=$(readlink -m "${i}")
 
     [[ "${data}" == "${path}" ]] && return 0
@@ -63,7 +63,7 @@ function log::native() {
   local -r info="${@:-"command"}"
 
   log::write "[Run] ${info}"
-  tee -a "${_butils_log_paths[@]}"
+  tee -a "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}"
   log::write "[Done] ${info}"
 }
 
@@ -76,7 +76,7 @@ function log::set() {
 function log::write() {
   local path
 
-  for path in "${_butils_log_paths[@]}"; do
+  for path in ${_butils_log_paths[@]+"${_butils_log_paths[@]}"}; do
     log::write_file -f "${path}" "$@"
   done
 }
