@@ -1,3 +1,9 @@
+function config::arg_state() {
+  local -r option=$(set -o | grep "$1" || echo "")
+
+  echo "${option}" | sed -r 's/.*\s+//'
+}
+
 function config::init_dirs() {
   export USER="${USER:-"${LOGNAME}"}"
 
