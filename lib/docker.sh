@@ -1,5 +1,3 @@
-#!/bin/bash
-
 function docker::pid() {
   local flag OPTARG OPTIND
   local -r flags=(--format '{{ .State.Pid }}')
