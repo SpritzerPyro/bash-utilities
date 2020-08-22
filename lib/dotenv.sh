@@ -13,7 +13,7 @@ function dotenv::grep() {
 
   shift $(( ${OPTIND} - 1 ))
 
-  if [[ -z "$@" ]] && [[ "${flags[@]}" =~ "--no-messages" ]]; then
+  if [[ ! "$@" ]] && [[ ! "${flags[@]}" =~ "--no-messages" ]]; then
     echo "dotenv::grep: No files specified" >&2
 
     return 1
@@ -29,7 +29,7 @@ function dotenv::source() {
   local -r allexport_state=$(_config::arg_state allexport)
   local flag OPTARG OPTIND
   local allexport=0
-  local grep_flags=()
+  local grep_flags=("")
 
   while getopts 'aisv:' flag; do
     case "${flag}" in
@@ -45,7 +45,7 @@ function dotenv::source() {
     set -a;
   fi
 
-  source <(dotenv::grep "${grep_flags[@]+"${grep_flags[@]}"}" "$@")
+  source <(dotenv::grep"${grep_flags[@]}" "$@")
 
   if [[ "${allexport_state}" == "off" ]]; then
     set +a;
