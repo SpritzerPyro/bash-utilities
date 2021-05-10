@@ -1,6 +1,6 @@
 function dotenv::grep() {
   local flag OPTARG OPTIND
-  local matcher=(--extended-regexp)
+  local matcher="--extended-regexp"
   local flags=(--directories='skip' --no-filename)
   local var_regex="[a-zA-Z_]+[a-zA-Z0-9_]*"
 
@@ -8,7 +8,7 @@ function dotenv::grep() {
     case "${flag}" in
       i) flags+=(--ignore-case) ;;
       s) flags+=(--no-messages) ;;
-      p) matcher=(--perl-regexp) ;;
+      p) matcher="--perl-regexp" ;;
       v) var_regex="${OPTARG}" ;;
     esac
   done
