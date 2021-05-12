@@ -1,17 +1,20 @@
 function dotenv::grep() {
   local flag OPTARG OPTIND
-  local flags=(--directories='skip' --extended-regexp --no-filename)
+  local matcher="--extended-regexp"
+  local flags=(--directories='skip' --no-filename)
   local var_regex="[a-zA-Z_]+[a-zA-Z0-9_]*"
 
-  while getopts 'isv:' flag; do
+  while getopts 'ispv:' flag; do
     case "${flag}" in
       i) flags+=(--ignore-case) ;;
       s) flags+=(--no-messages) ;;
+      p) matcher="--perl-regexp" ;;
       v) var_regex="${OPTARG}" ;;
     esac
   done
 
   shift $(( ${OPTIND} - 1 ))
+  flags+=("${matcher}")
 
   if [[ ! "$@" ]] && [[ ! "${flags[@]}" =~ "--no-messages" ]]; then
     echo "dotenv::grep: No files specified" >&2
@@ -31,10 +34,10 @@ function dotenv::source() {
   local allexport=0
   local grep_flags=("")
 
-  while getopts 'aisv:' flag; do
+  while getopts 'aipsv:' flag; do
     case "${flag}" in
       a) allexport=1 ;;
-      i|s) grep_flags+=("-${flag}") ;;
+      i|p|s) grep_flags+=("-${flag}") ;;
       v) grep_flags+=("-v${OPTARG}") ;;
     esac
   done
