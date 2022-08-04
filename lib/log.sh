@@ -1,14 +1,24 @@
+# shellcheck shell=bash
+
 function log() {
   local flag OPTARG OPTIND
   local level="info"
+  local _multiline=0
 
-  while getopts 'l:' flag; do
+  while getopts 'l:m' flag; do
     case "${flag}" in
       l) level="${OPTARG}" ;;
+      m) _multiline=1 ;;
+      *) { echo "Invalid option provided" >&2; exit 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
+
+  if (( _multiline )); then
+    log::multiline "$@"
+    return
+  fi
 
   if (( $# > 0 )); then
     chalk -l "${level}" "$@"
@@ -17,7 +27,7 @@ function log() {
     return
   fi
 
-  while read data; do
+  while read -r data; do
     chalk -l "${level}" "${data}"
     log::write -l "${level}" "${data}"
   done
@@ -32,7 +42,7 @@ function log::add() {
     _butils_log_paths+=("$(readlink -m "${i}")")
   done
 
-  exec 2> >(while read line; do echo "${line}" | log -l error; done)
+  exec 2> >(while read -r line; do echo "${line}" | log -l error; done)
 
   trap 'log::exit_trap $?' EXIT
 }
@@ -47,11 +57,11 @@ function log::exit_trap() {
 }
 
 function log::is_set() {
-  local data=$(readlink -m "$1")
-  local i
+  local data i path
+  data=$(readlink -m "$1")
 
   for i in ${_butils_log_paths[@]+"${_butils_log_paths[@]}"}; do
-    local path=$(readlink -m "${i}")
+    path=$(readlink -m "${i}")
 
     [[ "${data}" == "${path}" ]] && return 0
   done
@@ -59,12 +69,18 @@ function log::is_set() {
   return 1
 }
 
-function log::native() {
-  local -r info="${@:-"command"}"
+function log::multiline() {
+  local -r info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
 
   log::write "[Run] ${info}"
-  tee -a "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}"
+  tee >(awk -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" '{print prefix$0}' \
+    >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}")
   log::write "[Done] ${info}"
+}
+
+# Allow use of the deprecated log::native function
+function log::native() {
+  log::multiline "$@"
 }
 
 function log::set() {
@@ -84,7 +100,7 @@ function log::write() {
 function log::write_file() {
   local flag OPTARG OPTIND
   local -A info
-  local file
+  local file size
   local level="info"
   local prefix=""
 
@@ -96,6 +112,7 @@ function log::write_file() {
 
         level="${OPTARG}"
         ;;
+      *) { echo "Invalid option provided" >&2; exit 1; } ;;
     esac
   done
 
@@ -104,11 +121,11 @@ function log::write_file() {
     return 1
   fi
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   _config::log_info info "${level}"
 
-  if [[ ! -z "${BUTILS_LOG_TIME_FORMAT}" ]]; then
+  if [[ "${BUTILS_LOG_TIME_FORMAT}" ]]; then
     prefix="[$(date +"${BUTILS_LOG_TIME_FORMAT}")] "
   fi
 
@@ -116,9 +133,9 @@ function log::write_file() {
   prefix="${BUTILS_COLORS[prefix]}${prefix}${BUTILS_COLORS[default]}"
 
   if [[ -f "${file}" ]]; then
-    local size=$(stat -c %s "${file}")
+    size=$(stat -c %s "${file}")
 
-    if (( ${size} > ${BUTILS_LOG_MAX_SIZE} )); then
+    if (( size > BUTILS_LOG_MAX_SIZE )); then
       local i=1
 
       while [[ -f "${file}.${i}" ]]; do
@@ -130,7 +147,7 @@ function log::write_file() {
   fi
 
   if [[ ! -f "${file}" ]]; then
-    mkdir -p $(dirname "${file}")
+    mkdir -p "$(dirname "${file}")"
     touch "${file}"
   fi
 
@@ -141,7 +158,7 @@ function log::write_file() {
     return
   fi
 
-  while read data; do
+  while read -r data; do
     echo -e "${prefix}$(chalk -l "${info[level]}" "${data}")" \
       | tee -a "${file}" >/dev/null
   done
@@ -151,7 +168,7 @@ function log::init() {
   declare -g _butils_log_paths=()
   local level
 
-  for level in ${!BUTILS_LOG_LEVELS[@]}; do
+  for level in "${!BUTILS_LOG_LEVELS[@]}"; do
     eval "function log::${level}() {
       log -l ${level} \"\$@\"
     }"

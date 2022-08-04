@@ -113,7 +113,7 @@ function executable_content() {
   echo '  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"; pwd)"'
   echo '  readonly script_dir'
   echo ''
-  echo "  source \"\${script_dir}/${libpath}\""
+  echo "  source \"\${script_dir}/${libpath}\" -a"
   echo ''
   echo '  echo "Hello world"'
   echo '}'
