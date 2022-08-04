@@ -369,28 +369,48 @@ echo "Lorem ipsum dolor sit amet" | log -l warn
 [2020-01-01T13:01:06.123+02:00] WARN  : Lorem ipsum dolor sit amet
 ```
 
-#### log::native
+##### log -m
+
+Use multiline logging, see [log::multiline](#logmultiline)
+
+```bash
+docker-compose up |& log -m
+```
+
+#### log::multiline
+
+**You now can use the shorter alias `log -m`**
 
 Some commands like `docker-compose up -d` create output not working properly using the standard log command.
 
-If you run into such a problem, the `log_native` command uses `tee` to natively add the output to the log files. This output then is not prefixed in the log file. To log some prefixed information, a `[Run] command` and `[Done] command` information also is logged before and after the command is executed. This information also is customizable by passing a string as an argument to `log::native "my test"`.
+If you run into such a problem, the `log::multiline` command uses `tee` to natively add the output to the log files. This output then is not prefixed by message metadata in the log file. To log some metadata information, a `[Run] Command` and `[Done] Command` information also is logged before and after the command is executed. This information also is customizable by passing a string as an argument to `log::multiline "my test"`.
+
+Every line is prefixed by "`>` " by default helping to identify theses messages by e.g. the logstash codec. To change this prefix you can override the `BUTILS_LOG_MULTILINE_PREFIX` variable.
 
 _Notice the use of `|&` because docker-compose writes to `stderr`._
 
 ```bash
-docker-compose up -d |& log_native "Up test docker"
-# Log file:
-# [2020-01-26 09:53:36] info    : [Run] Up test docker
-# Creating network "bash-utilities_default" with the default driver
-# Creating bash-utilities_test_1 ... done
-# [2020-01-26 09:53:36] info    : [Done] Up test docker
+docker-compose down |& log::multiline
+# Same as docker-compose down -d |& log -m
 
-docker-compose down |& log_native
 # Log file:
-# [2020-01-26 09:53:36] info    : [Run] command
-# Removing bash-utilities_test_1 ... done
-# Removing network bash-utilities_default
-# [2020-01-26 09:53:36] info    : [Done] command
+[2022-08-04T12:00:19.226+02:00] INFO  : [Run] Command (2022-08-04T12:00:19.222+02:00)
+[2020-01-26 09:53:36] info    : [Run] Command (2022-08-04T12:00:19.222+02:00)
+> Removing bash-utilities_test_1 ... done
+> Removing network bash-utilities_default
+[2022-08-04T12:00:19.226+02:00] INFO  : [Done] Command (2022-08-04T12:00:19.222+02:00)
+# ---
+
+export BUTILS_LOG_MULTILINE_PREFIX=""
+docker-compose up -d |& log::multiline "Up test docker"
+# Same as docker-compose up -d |& log -m "Up test docker"
+
+# Log file:
+[2022-08-04T12:00:19.226+02:00] INFO  : [Run] Up test docker
+Creating network "bash-utilities_default" with the default driver
+Creating bash-utilities_test_1 ... done
+[2022-08-04T12:00:19.226+02:00] INFO  : [Done] Up test docker
+# ---
 ```
 
 ## Config

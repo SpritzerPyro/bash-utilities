@@ -9,11 +9,11 @@ function create_header() {
 
   if
     [[ "${description}" ]] && \
-    (
+    {
       [[ "${author_email}" ]] || \
       [[ "${author_name}" ]] || \
-      [[ "${copyright}" ]]
-    )
+      [[ "${copyright}" ]];
+    }
   then
     echo "#"
   fi
@@ -44,19 +44,19 @@ function create_libname() {
 function create_path() {
   local _filename="$1"
 
-  if ! (( ${executable} )) && [[ "${_filename: -3}" != ".sh" ]]; then
+  if ! (( executable )) && [[ "${_filename: -3}" != ".sh" ]]; then
     _filename="${_filename}.sh"
   fi
 
-  if (( ${executable} )) && [[ "${_filename: -3}" == ".sh" ]]; then
+  if (( executable )) && [[ "${_filename: -3}" == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
 
     if query::polar "Remove extension '.sh'?"; then
       _filename="${_filename:0:-3}"
-    else
-      _filename="${_filename}"
     fi
   fi
+
+  escape_string _filename
 
   local -r _path=$(readlink -m "${_filename}")
 
@@ -77,15 +77,25 @@ function create_path() {
 }
 
 function escape_string() {
-  echo $(basename "$1") \
-    | tr -cs '[:alnum:]\n\r' '_' \
-    | tr '[:upper:]' '[:lower:]'
+  local -n _name="$1"
+  local -r _escaped=$(
+    basename "${_name}" \
+      | tr -cs '[:alnum:]\n\r' '_' \
+      | tr '[:upper:]' '[:lower:]'
+  )
+
+  if \
+    [[ "${_name}" != "${_escaped}" ]] && \
+    query::polar "Whoppi?";
+  then
+    _name="${_escaped}"
+  fi
 }
 
 function executable_content() {
   local -r header=$(create_header)
   local -r libpath=$(
-    realpath --relative-to=$(dirname "${target}") "${script_dir}/../butils.sh"
+    realpath --relative-to="$(dirname "${target}")" "${script_dir}/../butils.sh"
   )
 
   echo "#!/bin/bash"
@@ -99,9 +109,11 @@ function executable_content() {
   echo 'set -euo pipefail'
   echo ''
   echo 'function main() {'
-  echo '  readonly script_dir=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))'
+  # shellcheck disable=SC2016
+  echo '  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"; pwd)"'
+  echo '  readonly script_dir'
   echo ''
-  echo "  source \"\${script_dir}/${libpath}\""
+  echo "  source \"\${script_dir}/${libpath}\" -a"
   echo ''
   echo '  echo "Hello world"'
   echo '}'
@@ -154,14 +166,14 @@ function query_header() {
 
   if query::polar -n "Add copyright information?"; then
     query \
-      -d "$(date +'%Y') ${author_name:-$USER}" \
+      -d "$(date +'%Y') ${author_name:-"${USER}"}" \
       -v copyright \
       "Copyright information"
   fi
 }
 
 function usage() {
-  echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
+  echo "Usage: $(basename "$0") [OPTIONS] /path/to/file"
   echo ""
   echo "Selecting a filetype like executable or library is mandatory!"
   echo ""
@@ -184,14 +196,15 @@ function main() {
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   if [[ ! "${1-}" ]] || [[ ! "${executable-}" ]]; then
     usage >&2
     exit 1
   fi
 
-  readonly script_dir=$(dirname $(readlink -f "$0"))
+  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
+  readonly script_dir
 
   source "${script_dir}/../butils.sh"
 
@@ -200,12 +213,12 @@ function main() {
 
   create_path "$1" target
 
-  mkdir -p $(dirname "${target}")
+  mkdir -p "$(dirname "${target}")"
   rm -f "${target}"
 
   query_header
 
-  if (( ${executable} )); then
+  if (( executable )); then
     executable_content > "${target}"
     chmod +x "${target}"
     chalk -l success "Successfully created executable '${target}'"
