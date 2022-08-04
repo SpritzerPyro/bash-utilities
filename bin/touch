@@ -58,6 +58,8 @@ function create_path() {
     fi
   fi
 
+  escape_string _filename
+
   local -r _path=$(readlink -m "${_filename}")
 
   if [[ -d "${_path}" ]]; then
@@ -77,9 +79,19 @@ function create_path() {
 }
 
 function escape_string() {
-  echo $(basename "$1") \
-    | tr -cs '[:alnum:]\n\r' '_' \
-    | tr '[:upper:]' '[:lower:]'
+  local -n _name="$1"
+  local -r _escaped=$(
+    basename "${_name}" \
+      | tr -cs '[:alnum:]\n\r' '_' \
+      | tr '[:upper:]' '[:lower:]'
+  )
+
+  if \
+    [[ "${_name}" != "${_escaped}" ]] && \
+    query::polar "Whoppi?";
+  then
+    _name="${_escaped}"
+  fi
 }
 
 function executable_content() {
