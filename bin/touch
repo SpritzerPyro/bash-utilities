@@ -9,11 +9,11 @@ function create_header() {
 
   if
     [[ "${description}" ]] && \
-    (
+    {
       [[ "${author_email}" ]] || \
       [[ "${author_name}" ]] || \
-      [[ "${copyright}" ]]
-    )
+      [[ "${copyright}" ]];
+    }
   then
     echo "#"
   fi
@@ -44,17 +44,15 @@ function create_libname() {
 function create_path() {
   local _filename="$1"
 
-  if ! (( ${executable} )) && [[ "${_filename: -3}" != ".sh" ]]; then
+  if ! (( executable )) && [[ "${_filename: -3}" != ".sh" ]]; then
     _filename="${_filename}.sh"
   fi
 
-  if (( ${executable} )) && [[ "${_filename: -3}" == ".sh" ]]; then
+  if (( executable )) && [[ "${_filename: -3}" == ".sh" ]]; then
     chalk -l warn "Executables should have no extension"
 
     if query::polar "Remove extension '.sh'?"; then
       _filename="${_filename:0:-3}"
-    else
-      _filename="${_filename}"
     fi
   fi
 
@@ -97,7 +95,7 @@ function escape_string() {
 function executable_content() {
   local -r header=$(create_header)
   local -r libpath=$(
-    realpath --relative-to=$(dirname "${target}") "${script_dir}/../butils.sh"
+    realpath --relative-to="$(dirname "${target}")" "${script_dir}/../butils.sh"
   )
 
   echo "#!/bin/bash"
@@ -168,14 +166,14 @@ function query_header() {
 
   if query::polar -n "Add copyright information?"; then
     query \
-      -d "$(date +'%Y') ${author_name:-$USER}" \
+      -d "$(date +'%Y') ${author_name:-"${USER}"}" \
       -v copyright \
       "Copyright information"
   fi
 }
 
 function usage() {
-  echo "Usage: $(basename $0) [OPTIONS] /path/to/file"
+  echo "Usage: $(basename "$0") [OPTIONS] /path/to/file"
   echo ""
   echo "Selecting a filetype like executable or library is mandatory!"
   echo ""
@@ -198,7 +196,7 @@ function main() {
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   if [[ ! "${1-}" ]] || [[ ! "${executable-}" ]]; then
     usage >&2
@@ -215,12 +213,12 @@ function main() {
 
   create_path "$1" target
 
-  mkdir -p $(dirname "${target}")
+  mkdir -p "$(dirname "${target}")"
   rm -f "${target}"
 
   query_header
 
-  if (( ${executable} )); then
+  if (( executable )); then
     executable_content > "${target}"
     chmod +x "${target}"
     chalk -l success "Successfully created executable '${target}'"
