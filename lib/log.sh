@@ -16,7 +16,7 @@ function log() {
   shift $(( OPTIND - 1 ))
 
   if (( _multiline )); then
-    log::multiline "$@"
+    log::multiline -l "${level}" "$@"
     return
   fi
 
@@ -70,12 +70,24 @@ function log::is_set() {
 }
 
 function log::multiline() {
-  local -r info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
+  local _level=info
+  local flag OPTARG OPTIND
 
-  log::write "[Run] ${info}"
+  while getopts 'l:' flag; do
+    case "${flag}" in
+      l) _level="${OPTARG}" ;;
+      *) { echo "Invalid option provided" >&2; exit 1; } ;;
+    esac
+  done
+
+  shift $(( OPTIND - 1 ))
+
+  local -r _info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
+
+  log::write -l "${_level}" "[Run] ${_info}"
   tee >(awk -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" '{print prefix$0}' \
     >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}")
-  log::write "[Done] ${info}"
+  log::write -l "${_level}" "[Done] ${_info}"
 }
 
 # Allow use of the deprecated log::native function
