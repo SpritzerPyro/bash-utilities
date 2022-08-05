@@ -16,7 +16,7 @@ function log() {
   shift $(( OPTIND - 1 ))
 
   if (( _multiline )); then
-    log::multiline "$@"
+    log::multiline -l "${level}" "$@"
     return
   fi
 
@@ -70,12 +70,36 @@ function log::is_set() {
 }
 
 function log::multiline() {
-  local -r info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
+  local _level=info
+  local -A _loginfo
+  local flag OPTARG OPTIND
 
-  log::write "[Run] ${info}"
-  tee >(awk -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" '{print prefix$0}' \
-    >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}")
-  log::write "[Done] ${info}"
+  while getopts 'l:' flag; do
+    case "${flag}" in
+      l) _level="${OPTARG}" ;;
+      *) { echo "Invalid option provided" >&2; exit 1; } ;;
+    esac
+  done
+
+  shift $(( OPTIND - 1 ))
+
+  local -r _info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
+
+  _config::log_info _loginfo "${_level}"
+
+  log::write -l "${_level}" "[Run] ${_info}"
+
+  awk \
+    -v color="${_loginfo[color]}" \
+    -v reset="${BUTILS_COLORS[default]}" \
+    '{ line=sprintf("%s%s%s", color, $0, reset); print line }' \
+      | tee >(
+        awk \
+          -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" \
+          '{ line= sprintf("%s%s", prefix, $0); print line}' \
+          >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}"
+      )
+  log::write -l "${_level}" "[Done] ${_info}"
 }
 
 # Allow use of the deprecated log::native function
