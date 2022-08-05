@@ -71,6 +71,7 @@ function log::is_set() {
 
 function log::multiline() {
   local _level=info
+  local -A _loginfo
   local flag OPTARG OPTIND
 
   while getopts 'l:' flag; do
@@ -84,9 +85,20 @@ function log::multiline() {
 
   local -r _info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
 
+  _config::log_info _loginfo "${_level}"
+
   log::write -l "${_level}" "[Run] ${_info}"
-  tee >(awk -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" '{print prefix$0}' \
-    >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}")
+
+  awk \
+    -v color="${_loginfo[color]}" \
+    -v reset="${BUTILS_COLORS[default]}" \
+    '{ line=sprintf("%s%s%s", color, $0, reset); print line }' \
+      | tee >(
+        awk \
+          -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" \
+          '{ line= sprintf("%s%s", prefix, $0); print line}' \
+          >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}"
+      )
   log::write -l "${_level}" "[Done] ${_info}"
 }
 
