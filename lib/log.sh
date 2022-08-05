@@ -83,11 +83,9 @@ function log::multiline() {
 
   shift $(( OPTIND - 1 ))
 
-  local -r _info="${*:-"Command ($(date +"${BUTILS_LOG_TIME_FORMAT}"))"}"
-
   _config::log_info _loginfo "${_level}"
 
-  log::write -l "${_level}" "${*:-}"
+  log -l "${_level}" "${*:-}"
 
   log::_tee -c "${_loginfo[color]}"
 

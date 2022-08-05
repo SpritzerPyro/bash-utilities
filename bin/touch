@@ -110,7 +110,7 @@ function executable_content() {
   echo ''
   echo 'function main() {'
   # shellcheck disable=SC2016
-  echo '  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"; pwd)"'
+  echo '  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" || exit; pwd)"'
   echo '  readonly script_dir'
   echo ''
   echo "  source \"\${script_dir}/${libpath}\" -a"
@@ -203,7 +203,7 @@ function main() {
     exit 1
   fi
 
-  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"; pwd)"
+  script_dir="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" || exit; pwd)"
   readonly script_dir
 
   source "${script_dir}/../butils.sh"
