@@ -211,6 +211,6 @@ function log::_tee() {
         awk \
           -v prefix="${BUTILS_LOG_MULTILINE_PREFIX:-}" \
           '{ line= sprintf("%s%s", prefix, $0); print line}' \
-          >> "${_butils_log_paths[@]+"${_butils_log_paths[@]}"}"
+          | tee -a "${_butils_log_paths[@]}" >/dev/null
       )
 }
