@@ -51,9 +51,8 @@ function log::exit_trap() {
   [[ "$1" == "0" ]] && return 0
 
   IFS=' ' read -ra caller_array <<< "$(caller)"
-  caller_path=$(readlink -f "${caller_array[1]}")
 
-  echo "${caller_path} exited with code $1" | log -l error
+  echo "${caller_array[1]} exited with code $1" >&2
 }
 
 function log::is_set() {
