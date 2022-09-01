@@ -8,28 +8,27 @@ function chalk() {
     case "${flag}" in
       l) level="${OPTARG}" ;;
       n) flags+=("-${flag}") ;;
+      *) { echo "Invalid option provided" >&2; return 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   _config::log_info info "${level}"
 
   if (( "$#" > 0 )); then
-    echo "${flags[@]}" "${info[color]}$@${BUTILS_COLORS[default]}"
-
-    return
+    echo "${flags[@]}" "${info[color]}$*${BUTILS_COLORS[default]}"
+  else
+    while read -r data; do
+      echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLORS[default]}"
+    done
   fi
-
-  while read data; do
-    echo "${flags[@]}" "${info[color]}${data}${BUTILS_COLORS[default]}"
-  done
 }
 
 function chalk::init() {
   local level
 
-  for level in ${!BUTILS_LOG_LEVELS[@]}; do
+  for level in "${!BUTILS_LOG_LEVELS[@]}"; do
     eval "function chalk::${level}() {
       local flags=(-l ${level})
       local OPTIND
@@ -37,6 +36,7 @@ function chalk::init() {
       while getopts 'n' flag; do
         case \"\${flag}\" in
           n) flags+=(\"-\${flag}\") ;;
+          *) { echo \"Invalid option provided2\" >&2; return 1; } ;;
         esac
       done
 

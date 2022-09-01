@@ -17,20 +17,15 @@ function log() {
 
   if (( _multiline )); then
     log::multiline -l "${level}" "$@"
-    return
-  fi
-
-  if (( $# > 0 )); then
+  elif (( $# > 0 )); then
     chalk -l "${level}" "$@"
     log::write -l "${level}" "$@"
-
-    return
+  else
+    while read -r data; do
+      chalk -l "${level}" "${data}"
+      log::write -l "${level}" "${data}"
+    done
   fi
-
-  while read -r data; do
-    chalk -l "${level}" "${data}"
-    log::write -l "${level}" "${data}"
-  done
 }
 
 function log::add() {
@@ -168,14 +163,12 @@ function log::write_file() {
   if (( $# > 0 )); then
     echo -e "${prefix}$(chalk -l "${info[level]}" "$@")" \
       | tee -a "${file}" >/dev/null
-
-    return
+  else
+    while read -r data; do
+      echo -e "${prefix}$(chalk -l "${info[level]}" "${data}")" \
+        | tee -a "${file}" >/dev/null
+    done
   fi
-
-  while read -r data; do
-    echo -e "${prefix}$(chalk -l "${info[level]}" "${data}")" \
-      | tee -a "${file}" >/dev/null
-  done
 }
 
 function log::init() {
