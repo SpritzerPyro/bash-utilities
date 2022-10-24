@@ -14,38 +14,39 @@ function query() {
       o) _optional=1 ;;
       p) _path=1 ;;
       v) _variable="${OPTARG}" ;;
+      *) { echo "Invalid option provided" >&2; return 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
-  local _question="${@:-"Input"}"
+  local _question="${*:-"Input"}"
 
   while true; do
     if [[ "${_default}" ]]; then
       echo -n "${_question} (${_default}): "
-    elif (( ${_optional} )); then
+    elif (( _optional )); then
       echo -n "${_question} (optional): "
     else
       echo -n "${_question}: "
     fi
 
-    read _answer
+    read -r _answer
 
     if [[ "${_default}" ]]; then
       _answer="${_answer:-"${_default}"}"
     fi
 
-    if [[ ! "${_answer}" ]] && ! (( ${_optional} )); then
+    if [[ ! "${_answer}" ]] && ! (( _optional )); then
       echo "Required"
 
       continue
     fi
 
     if
-      (( ${_email} )) && \
+      (( _email )) && \
       ! check::email "${_answer}" && \
-      ([[ "${_answer}" ]] || ! (( ${_optional} )))
+      ([[ "${_answer}" ]] || ! (( _optional )))
     then
       echo "Invalid email"
 
@@ -53,7 +54,7 @@ function query() {
     fi
 
     if (( "${_path}" )); then
-      _answer="$(echo "${_answer}" | sed "s#^~#${HOME}#")"
+      _answer="${_answer/#\~/"${HOME}"}"
     fi
 
     eval "${_variable}='${_answer}'"
@@ -71,10 +72,11 @@ function query::email() {
       d) _flags+=(-d "${OPTARG}") ;;
       o) _flags+=(-o) ;;
       v) _flags+=(-v "${OPTARG}") ;;
+      *) { echo "Invalid option provided" >&2; return 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   query "${_flags[@]}" "$@"
 }
@@ -88,10 +90,11 @@ function query::path() {
       d) _flags+=(-d "${OPTARG}") ;;
       o) _flags+=(-o) ;;
       v) _flags+=(-v "${OPTARG}") ;;
+      *) { echo "Invalid option provided" >&2; return 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
   query "${_flags[@]}" "$@"
 }
@@ -107,12 +110,13 @@ function query::polar() {
       n) _default="no" ;;
       v) _variable="${OPTARG}" ;;
       y) _default="yes" ;;
+      *) { echo "Invalid option provided" >&2; return 1; } ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $(( OPTIND - 1 ))
 
-  local _question="${@:-"Input"} (yes|no)"
+  local _question="${*:-"Input"} (yes|no)"
 
   while true; do
     if [[ "${_default}" ]]; then
@@ -121,7 +125,7 @@ function query::polar() {
       echo -n "${_question}: "
     fi
 
-    read _answer
+    read -r _answer
 
     if [[ "${_default}" ]]; then
       _answer="${_answer:-"${_default}"}"
