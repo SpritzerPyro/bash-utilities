@@ -86,7 +86,7 @@ function escape_string() {
 
   if \
     [[ "${_name}" != "${_escaped}" ]] && \
-    query::polar "Whoppi?";
+    query::polar "Do you want to escape the filename to '${_escaped}'?";
   then
     _name="${_escaped}"
   fi
