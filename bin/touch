@@ -78,17 +78,19 @@ function create_path() {
 
 function escape_string() {
   local -n _name="$1"
+  local -r _basename="$(basename "${_name}")"
+  local -r _dirname="$(dirname "${_name}")"
   local -r _escaped=$(
-    basename "${_name}" \
+    echo "${_basename}" \
       | tr -cs '[:alnum:]\n\r' '_' \
       | tr '[:upper:]' '[:lower:]'
   )
 
   if \
-    [[ "${_name}" != "${_escaped}" ]] && \
+    [[ "${_basename}" != "${_escaped}" ]] && \
     query::polar "Do you want to escape the filename to '${_escaped}'?";
   then
-    _name="${_escaped}"
+    _name="${_dirname}/${_escaped}"
   fi
 }
 
