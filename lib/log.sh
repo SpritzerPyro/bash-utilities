@@ -39,7 +39,9 @@ function log::add() {
 
   exec 2> >(while read -r line; do echo "${line}" | log -l error; done)
 
-  trap 'log::exit_trap $?' EXIT
+  if [[ ! "$(trap -p EXIT)" ]]; then
+    trap 'log::exit_trap $?' EXIT
+  fi
 }
 
 function log::exit_trap() {
