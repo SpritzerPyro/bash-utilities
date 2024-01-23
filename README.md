@@ -159,64 +159,6 @@ check::true ""      # 1 (falsy)
 check::true foo     # 1 (falsy)
 ```
 
-### docker.sh
-
-The file `lib/docker.sh` contains utilities for docker and docker-compose.
-
-```bash
-butils::use docker
-```
-
-#### docker::pid
-
-Returns the pid of a docker container.
-
-| flag | usage              | description                          |
-| ---- | ------------------ | ------------------------------------ |
-| s    | `-s CONTAINER`     | Specifies the target container       |
-| t    | `-t CONTAINER`     | Alternative to the `-s` flag         |
-| w    | `-w /path/to/file` | Writes the pid to the specified file |
-
-```bash
-docker::pid TARGET
-docker::pid -t TARGET
-docker::pid -w /path/to/file TARGET
-```
-
-#### docker_compose::id
-
-Returns the id of a docker-compose service.
-
-| flag | usage                   | description                         |
-| ---- | ----------------------- | ----------------------------------- |
-| f    | `-f docker-compose.yml` | Specifies the docker-compose file   |
-| s    | `-s CONTAINER`          | Specifies the target service        |
-| t    | `-t CONTAINER`          | Alternative to the `-s` flag        |
-| w    | `-w /path/to/file`      | Writes the id to the specified file |
-
-```bash
-docker_compose::id SERVICE
-docker_compose::id -s SERVICE
-docker_compose::id -f compose.yml -w /path/to/file SERVICE
-```
-
-#### docker_compose::pid
-
-Returns the pid of a docker-compose service.
-
-| flag | usage                   | description                          |
-| ---- | ----------------------- | ------------------------------------ |
-| f    | `-f docker-compose.yml` | Specifies the docker-compose file    |
-| s    | `-s CONTAINER`          | Specifies the target service         |
-| t    | `-t CONTAINER`          | Alternative to the `-s` flag         |
-| w    | `-w /path/to/file`      | Writes the pid to the specified file |
-
-```bash
-docker_compose::pid SERVICE
-docker_compose::pid -s SERVICE
-docker_compose::pid -f compose.yml -w /path/to/file SERVICE
-```
-
 ### dotenv.sh
 
 In the script `lib/dotenv.sh` utilities to deal with dotenv files can be found.
