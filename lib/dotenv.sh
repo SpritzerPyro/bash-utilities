@@ -10,10 +10,11 @@ function dotenv::grep() {
       s) flags+=(--no-messages) ;;
       p) matcher="--perl-regexp" ;;
       v) var_regex="${OPTARG}" ;;
+      *) echo "Invalid flag: ${flag}" >&2 ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $((OPTIND - 1))
   flags+=("${matcher}")
 
   if [[ ! "$@" ]] && [[ ! "${flags[@]}" =~ "--no-messages" ]]; then
@@ -37,20 +38,22 @@ function dotenv::source() {
   while getopts 'aipsv:' flag; do
     case "${flag}" in
       a) allexport=1 ;;
-      i|p|s) grep_flags+=("-${flag}") ;;
+      i | p | s) grep_flags+=("-${flag}") ;;
       v) grep_flags+=("-v${OPTARG}") ;;
+      *) echo "Invalid flag: ${flag}" >&2 ;;
     esac
   done
 
-  shift $(( ${OPTIND} - 1 ))
+  shift $((OPTIND - 1))
 
-  if (( ${allexport} )); then
-    set -a;
+  if ((allexport)); then
+    set -a
   fi
 
+  # shellcheck disable=SC1090
   source <(dotenv::grep"${grep_flags[@]}" "$@")
 
   if [[ "${allexport_state}" == "off" ]]; then
-    set +a;
+    set +a
   fi
 }
